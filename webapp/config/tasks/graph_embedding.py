@@ -21,19 +21,21 @@ GRAPH_EMBEDDING_TASK = {
     
     # Task-specific configuration
     'supported_models': [
-        'node2vec', 'deepwalk', 'line', 'sdne', 'graphsage', 'gcn'
+        'gcn', 'gat', 'graphsage', 'gin', 'chebnet', 'sgc'
     ],
     'supported_datasets': [
-        'cora', 'citeseer', 'pubmed', 'ppi', 'reddit', 'flickr',
-        'ogbn_products', 'ogbn_mag', 'ogbn_papers100m', 'zinc', 'qm9'
+        'synthetic', 'cora', 'citeseer', 'pubmed', 'amazon_photo', 'amazon_computers',
+        'coauthor_cs', 'coauthor_physics', 'reddit', 'flickr'
     ],
     'metrics': [
         'reconstruction_loss', 'link_prediction_auc', 'node_classification_acc',
-        'clustering_coefficient', 'embedding_quality', 'visualization_quality'
+        'clustering_coefficient', 'embedding_quality', 'visualization_quality',
+        'silhouette_score', 'calinski_harabasz_score', 'davies_bouldin_score'
     ],
     'visualizations': [
         'embedding_scatter', 't_sne_plot', 'umap_plot', 'pca_plot',
-        'embedding_heatmap', 'similarity_matrix', 'clustering_plot'
+        'embedding_heatmap', 'similarity_matrix', 'clustering_plot',
+        '3d_scatter_plot', 'interactive_plot'
     ],
     
     # Training configuration
