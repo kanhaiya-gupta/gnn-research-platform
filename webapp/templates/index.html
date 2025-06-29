@@ -1,0 +1,362 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block content %}
+<div class="dashboard-container">
+    <!-- Header Section -->
+    <div class="dashboard-header">
+        <div class="header-content">
+            <h1 class="main-title">
+                <i class="fas fa-project-diagram"></i>
+                Graph Neural Network Platform
+            </h1>
+            <p class="subtitle">
+                Comprehensive platform for GNN research and applications across multiple domains
+            </p>
+        </div>
+    </div>
+
+    <!-- GNN Purposes Overview -->
+    <div class="purposes-section">
+        <h2 class="section-title">
+            <i class="fas fa-compass"></i>
+            GNN Applications & Purposes
+        </h2>
+        <div class="purposes-grid">
+            {% for purpose_key, purpose_info in purposes.items() %}
+            <div class="purpose-card" data-purpose="{{ purpose_key }}">
+                <div class="purpose-header" style="border-left: 4px solid var(--{{ purpose_info.color }})">
+                    <div class="purpose-icon">
+                        <i class="{{ purpose_info.icon }}"></i>
+                    </div>
+                    <div class="purpose-title">
+                        <h3>{{ purpose_info.name }}</h3>
+                    </div>
+                </div>
+                <div class="purpose-body">
+                    <p class="purpose-description">{{ purpose_info.description }}</p>
+                    
+                    {% if purpose_info.subpurposes %}
+                    <div class="subpurposes">
+                        {% for sub_key, sub_info in purpose_info.subpurposes.items() %}
+                        <div class="subpurpose-item">
+                            <i class="{{ sub_info.icon }}"></i>
+                            <span>{{ sub_info.name }}</span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="purpose-stats">
+                        {% if purpose_info.models %}
+                        <div class="stat-item">
+                            <i class="fas fa-brain"></i>
+                            <span>{{ purpose_info.models|length }} Models</span>
+                        </div>
+                        {% endif %}
+                        {% if purpose_info.parameters %}
+                        <div class="stat-item">
+                            <i class="fas fa-cogs"></i>
+                            <span>{{ purpose_info.parameters|length }} Parameters</span>
+                        </div>
+                        {% endif %}
+                    </div>
+                    <div class="purpose-actions">
+                        <a href="/purpose/{{ purpose_key }}" class="btn btn-primary">
+                            <i class="fas fa-arrow-right"></i>
+                            Explore {{ purpose_info.name }}
+                        </a>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Statistics Cards -->
+    <div class="stats-section">
+        <h2 class="section-title">
+            <i class="fas fa-chart-bar"></i>
+            Platform Overview
+        </h2>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-brain"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ config.SUPPORTED_MODELS|length }}</h3>
+                        <p>GNN Models Supported</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ config.SUPPORTED_PARAMETERS|length }}</h3>
+                        <p>Parameters Available</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-compass"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>{{ purposes|length }}</h3>
+                        <p>GNN Applications</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="stat-card">
+                    <div class="stat-icon">
+                        <i class="fas fa-eye"></i>
+                    </div>
+                    <div class="stat-content">
+                        <h3>Interactive</h3>
+                        <p>Visualization</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Research Areas -->
+    <div class="research-section">
+        <h2 class="section-title">
+            <i class="fas fa-microscope"></i>
+            Research Areas & Impact
+        </h2>
+        <div class="row">
+            <div class="col-md-6">
+                <div class="research-card">
+                    <h4><i class="fas fa-users"></i> Social Network Analysis</h4>
+                    <p>Analyze social networks to understand community structures, influence patterns, and information diffusion.</p>
+                    <ul>
+                        <li>Community detection and clustering</li>
+                        <li>Influence maximization</li>
+                        <li>Link prediction and recommendation</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="research-card">
+                    <h4><i class="fas fa-flask"></i> Computational Biology</h4>
+                    <p>Model biological networks including protein-protein interactions, gene regulatory networks, and drug discovery.</p>
+                    <ul>
+                        <li>Protein function prediction</li>
+                        <li>Drug-target interaction</li>
+                        <li>Disease gene identification</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="research-card">
+                    <h4><i class="fas fa-shopping-cart"></i> Recommendation Systems</h4>
+                    <p>Build personalized recommendation systems using graph-based collaborative filtering and content analysis.</p>
+                    <ul>
+                        <li>User-item recommendation</li>
+                        <li>Session-based recommendation</li>
+                        <li>Multi-modal recommendation</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="research-card">
+                    <h4><i class="fas fa-shield-alt"></i> Cybersecurity</h4>
+                    <p>Detect anomalies, identify threats, and analyze network security using graph-based approaches.</p>
+                    <ul>
+                        <li>Anomaly detection</li>
+                        <li>Malware classification</li>
+                        <li>Network intrusion detection</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Popular Models -->
+    <div class="models-section">
+        <h2 class="section-title">
+            <i class="fas fa-star"></i>
+            Popular GNN Models
+        </h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="model-card">
+                    <div class="model-header">
+                        <i class="fas fa-network-wired"></i>
+                        <h4>Graph Convolutional Network (GCN)</h4>
+                    </div>
+                    <p>Semi-supervised learning with graph convolutions. The foundational model that started the GNN revolution.</p>
+                    <div class="model-stats">
+                        <span class="badge badge-primary">Node Classification</span>
+                        <span class="badge badge-success">Link Prediction</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="model-card">
+                    <div class="model-header">
+                        <i class="fas fa-eye"></i>
+                        <h4>Graph Attention Network (GAT)</h4>
+                    </div>
+                    <p>Attention-based graph neural network that learns to focus on the most relevant neighbors for each node.</p>
+                    <div class="model-stats">
+                        <span class="badge badge-primary">Node Classification</span>
+                        <span class="badge badge-info">Interpretable</span>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="model-card">
+                    <div class="model-header">
+                        <i class="fas fa-sitemap"></i>
+                        <h4>GraphSAGE</h4>
+                    </div>
+                    <p>Inductive representation learning on large graphs. Scales to graphs with millions of nodes.</p>
+                    <div class="model-stats">
+                        <span class="badge badge-primary">Node Classification</span>
+                        <span class="badge badge-warning">Scalable</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Start Guide -->
+    <div class="quick-start-section">
+        <h2 class="section-title">
+            <i class="fas fa-rocket"></i>
+            Getting Started
+        </h2>
+        <div class="row">
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <h4>Choose Application</h4>
+                    <p>Select from 12 GNN purposes: node tasks, edge tasks, graph tasks, or specialized applications</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <h4>Select Model</h4>
+                    <p>Pick from 20+ GNN models including GCN, GAT, GraphSAGE, and specialized architectures</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <h4>Configure Parameters</h4>
+                    <p>Set 50+ parameters including architecture, training, and task-specific configurations</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="step-card">
+                    <div class="step-number">4</div>
+                    <h4>Train & Analyze</h4>
+                    <p>Launch GNN training and monitor progress with interactive visualizations and metrics</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Features -->
+    <div class="features-section">
+        <h2 class="section-title">
+            <i class="fas fa-tools"></i>
+            Platform Features
+        </h2>
+        <div class="row">
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-code"></i>
+                    </div>
+                    <h4>Modular Architecture</h4>
+                    <p>Extensible design with purpose-specific modules that can be easily added or modified.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <h4>Interactive Visualization</h4>
+                    <p>Real-time training curves, graph visualizations, and result analysis with interactive plots.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-database"></i>
+                    </div>
+                    <h4>Dataset Management</h4>
+                    <p>Built-in support for popular graph datasets and easy integration of custom data.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-cogs"></i>
+                    </div>
+                    <h4>Hyperparameter Tuning</h4>
+                    <p>Automated hyperparameter optimization with grid search, random search, and Bayesian optimization.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-share-alt"></i>
+                    </div>
+                    <h4>Model Sharing</h4>
+                    <p>Export trained models, share experiments, and collaborate with the research community.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="feature-card">
+                    <div class="feature-icon">
+                        <i class="fas fa-graduation-cap"></i>
+                    </div>
+                    <h4>Educational Resources</h4>
+                    <p>Comprehensive documentation, tutorials, and examples for learning GNN concepts.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Add click handlers for purpose cards
+    const purposeCards = document.querySelectorAll('.purpose-card');
+    purposeCards.forEach(card => {
+        card.addEventListener('click', function() {
+            const purpose = this.dataset.purpose;
+            window.location.href = `/purpose/${purpose}`;
+        });
+    });
+
+    // Add hover effects
+    purposeCards.forEach(card => {
+        card.addEventListener('mouseenter', function() {
+            this.style.transform = 'translateY(-5px)';
+            this.style.boxShadow = '0 10px 25px rgba(0,0,0,0.15)';
+        });
+        
+        card.addEventListener('mouseleave', function() {
+            this.style.transform = 'translateY(0)';
+            this.style.boxShadow = '0 5px 15px rgba(0,0,0,0.1)';
+        });
+    });
+});
+</script>
+{% endblock %} 

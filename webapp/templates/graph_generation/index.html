@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Graph Generation - GNN Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-project-diagram"></i>
+                        Graph Generation
+                    </h1>
+                    <p class="text-muted mb-0">Generate realistic graphs using deep learning models</p>
+                </div>
+                <div>
+                    <a href="/" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purpose Description -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i> About Graph Generation
+                    </h5>
+                    <p class="card-text">
+                        Graph generation involves creating realistic graphs that follow the statistical properties 
+                        and structural patterns of real-world networks. This is useful for data augmentation, 
+                        synthetic data creation, and understanding graph formation processes.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-lightbulb"></i> Applications:</h6>
+                            <ul>
+                                <li>Data augmentation for graph datasets</li>
+                                <li>Synthetic graph generation</li>
+                                <li>Molecular graph generation</li>
+                                <li>Social network simulation</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-cogs"></i> Key Features:</h6>
+                            <ul>
+                                <li>Conditional graph generation</li>
+                                <li>Unconditional graph generation</li>
+                                <li>Property-guided generation</li>
+                                <li>Scalable generation methods</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Models -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4><i class="fas fa-brain"></i> Available Models</h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- GraphRNN -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-network-wired"></i> GraphRNN
+                    </h5>
+                    <p class="card-text">
+                        Recurrent neural network for generating realistic graphs by modeling graph generation as a sequence.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> You et al. (ICML 2018)</p>
+                        <p><strong>Formula:</strong> P(G) = Π_t P(G_t|G_{<t})</p>
+                        <p><strong>Applications:</strong> Sequential graph generation</p>
+                    </div>
+                    <a href="/purpose/graph_generation/experiment/graphrnn" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- GraphVAE -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-eye"></i> GraphVAE
+                    </h5>
+                    <p class="card-text">
+                        Variational autoencoder for generating graphs by learning a continuous latent representation.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Simonovsky & Komodakis (ICLR 2018)</p>
+                        <p><strong>Formula:</strong> ELBO = E[log p(G|z)] - KL(q(z|G)||p(z))</p>
+                        <p><strong>Applications:</strong> Continuous graph generation</p>
+                    </div>
+                    <a href="/purpose/graph_generation/experiment/graphvae" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- GraphGAN -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-magic"></i> GraphGAN
+                    </h5>
+                    <p class="card-text">
+                        Generative adversarial network for generating realistic graphs through adversarial training.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Wang et al. (AAAI 2018)</p>
+                        <p><strong>Formula:</strong> min_G max_D V(D,G) = E[log D(G_real)] + E[log(1-D(G_fake))]</p>
+                        <p><strong>Applications:</strong> Adversarial graph generation</p>
+                    </div>
+                    <a href="/purpose/graph_generation/experiment/graphgan" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- MolGAN -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-atom"></i> MolGAN
+                    </h5>
+                    <p class="card-text">
+                        Generative adversarial network specifically designed for molecular graph generation.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> De Cao & Kipf (ICML 2018)</p>
+                        <p><strong>Formula:</strong> GAN with reward network for molecular validity</p>
+                        <p><strong>Applications:</strong> Molecular graph generation</p>
+                    </div>
+                    <a href="/purpose/graph_generation/experiment/molgan" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- GraphAF -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-stream"></i> GraphAF
+                    </h5>
+                    <p class="card-text">
+                        Autoregressive flow-based model for generating molecular graphs with continuous latent variables.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Shi et al. (ICLR 2020)</p>
+                        <p><strong>Formula:</strong> Flow-based generation with autoregressive modeling</p>
+                        <p><strong>Applications:</strong> Flow-based graph generation</p>
+                    </div>
+                    <a href="/purpose/graph_generation/experiment/graphaf" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- GraphScore -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-chart-line"></i> GraphScore
+                    </h5>
+                    <p class="card-text">
+                        Score-based generative model for generating graphs through denoising diffusion processes.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Niu et al. (ICLR 2020)</p>
+                        <p><strong>Formula:</strong> Score-based diffusion for graph generation</p>
+                        <p><strong>Applications:</strong> Diffusion-based graph generation</p>
+                    </div>
+                    <a href="/purpose/graph_generation/experiment/graphscore" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">6</h5>
+                    <p class="card-text">Available Models</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Realistic</h5>
+                    <p class="card-text">Graph Generation</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Multiple</h5>
+                    <p class="card-text">Generation Methods</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">Scalable</h5>
+                    <p class="card-text">Generation Process</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.model-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e9ecef;
+}
+
+.model-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.model-details {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+}
+
+.model-details p {
+    margin-bottom: 0.5rem;
+}
+
+.card-title {
+    color: var(--primary);
+    font-weight: 600;
+}
+</style>
+{% endblock %}

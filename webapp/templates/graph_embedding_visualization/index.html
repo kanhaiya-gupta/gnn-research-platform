@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Graph Embedding Visualization - GNN Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-chart-scatter"></i>
+                        Graph Embedding Visualization
+                    </h1>
+                    <p class="text-muted mb-0">Visualize and explore graph embeddings in low-dimensional spaces</p>
+                </div>
+                <div>
+                    <a href="/" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purpose Description -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i> About Graph Embedding Visualization
+                    </h5>
+                    <p class="card-text">
+                        Graph embedding visualization helps understand the learned representations of nodes, edges, 
+                        and graphs in low-dimensional spaces. This enables exploration of graph structure, 
+                        identification of clusters, and interpretation of learned features.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-lightbulb"></i> Applications:</h6>
+                            <ul>
+                                <li>Graph structure exploration</li>
+                                <li>Cluster identification</li>
+                                <li>Feature interpretation</li>
+                                <li>Model debugging and analysis</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-cogs"></i> Key Features:</h6>
+                            <ul>
+                                <li>2D/3D embedding visualization</li>
+                                <li>Interactive exploration tools</li>
+                                <li>Multiple dimensionality reduction methods</li>
+                                <li>Real-time embedding updates</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Models -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4><i class="fas fa-brain"></i> Available Models</h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Node2Vec -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-network-wired"></i> Node2Vec
+                    </h5>
+                    <p class="card-text">
+                        Scalable feature learning for nodes in networks using biased random walks.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Grover & Leskovec (KDD 2016)</p>
+                        <p><strong>Formula:</strong> Skip-gram with biased random walks</p>
+                        <p><strong>Applications:</strong> Node embedding visualization</p>
+                    </div>
+                    <a href="/purpose/graph_embedding_visualization/experiment/node2vec" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- DeepWalk -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-walking"></i> DeepWalk
+                    </h5>
+                    <p class="card-text">
+                        Social representation learning using truncated random walks.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Perozzi et al. (KDD 2014)</p>
+                        <p><strong>Formula:</strong> Skip-gram on random walk sequences</p>
+                        <p><strong>Applications:</strong> Social network embedding</p>
+                    </div>
+                    <a href="/purpose/graph_embedding_visualization/experiment/deepwalk" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- LINE -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-link"></i> LINE
+                    </h5>
+                    <p class="card-text">
+                        Large-scale information network embedding preserving first and second-order proximities.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Tang et al. (WWW 2015)</p>
+                        <p><strong>Formula:</strong> Joint optimization of proximities</p>
+                        <p><strong>Applications:</strong> Large-scale network embedding</p>
+                    </div>
+                    <a href="/purpose/graph_embedding_visualization/experiment/line" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- SDNE -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-sitemap"></i> SDNE
+                    </h5>
+                    <p class="card-text">
+                        Structural deep network embedding using deep autoencoders.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Wang et al. (KDD 2016)</p>
+                        <p><strong>Formula:</strong> Deep autoencoder with Laplacian eigenmaps</p>
+                        <p><strong>Applications:</strong> Deep network embedding</p>
+                    </div>
+                    <a href="/purpose/graph_embedding_visualization/experiment/sdne" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- GraphSAGE -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-sitemap"></i> GraphSAGE
+                    </h5>
+                    <p class="card-text">
+                        Inductive representation learning on large graphs using neighbor sampling.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Hamilton et al. (NeurIPS 2017)</p>
+                        <p><strong>Formula:</strong> h_v^k = σ(W^k · CONCAT(h_v^{k-1}, AGG({h_u^{k-1}})))</p>
+                        <p><strong>Applications:</strong> Inductive embedding learning</p>
+                    </div>
+                    <a href="/purpose/graph_embedding_visualization/experiment/graphsage" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- GCN -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-network-wired"></i> Graph Convolutional Network (GCN)
+                    </h5>
+                    <p class="card-text">
+                        Semi-supervised learning with graph convolutional layers for node representation.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Kipf & Welling (ICLR 2017)</p>
+                        <p><strong>Formula:</strong> H(l+1) = σ(D̃^(-1/2)ÃD̃^(-1/2)H(l)W(l))</p>
+                        <p><strong>Applications:</strong> Semi-supervised embedding</p>
+                    </div>
+                    <a href="/purpose/graph_embedding_visualization/experiment/gcn" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">6</h5>
+                    <p class="card-text">Available Models</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-success">2D/3D</h5>
+                    <p class="card-text">Visualization</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Interactive</h5>
+                    <p class="card-text">Exploration Tools</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">Real-time</h5>
+                    <p class="card-text">Embedding Updates</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.model-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e9ecef;
+}
+
+.model-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.model-details {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+}
+
+.model-details p {
+    margin-bottom: 0.5rem;
+}
+
+.card-title {
+    color: var(--primary);
+    font-weight: 600;
+}
+</style>
+{% endblock %}

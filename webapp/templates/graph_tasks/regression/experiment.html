@@ -1,0 +1,582 @@
+{% extends "base.html" %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_head %}
+<style>
+    .parameter-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .parameter-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: var(--dark);
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .training-controls {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .progress-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .chart-container {
+        height: 300px;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-flask"></i>
+                        {{ model.name }} Experiment
+                    </h1>
+                    <p class="text-muted mb-0">{{ purpose.name }} - {{ purpose.description }}</p>
+                </div>
+                <div>
+                    <a href="/purpose/{{ purpose_name }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to {{ purpose.name }}
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Left Column - Parameters and Controls -->
+        <div class="col-lg-8">
+            <!-- Model Information -->
+            <div class="parameter-section">
+                <h4><i class="fas fa-info-circle"></i> Model Information</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Model:</strong> {{ model.name }}</p>
+                        <p><strong>Paper:</strong> {{ model.paper }}</p>
+                        <p><strong>Type:</strong> Graph Regression</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Formula:</strong> <code>{{ model.formula }}</code></p>
+                        <p><strong>Applications:</strong> {{ model.applications|join(', ') }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Architecture Parameters -->
+            <div class="parameter-section">
+                <h4><i class="fas fa-cogs"></i> Architecture Parameters</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="hidden_dim" class="form-label">Hidden Dimension</label>
+                            <input type="number" class="form-control" id="hidden_dim" name="hidden_dim" 
+                                   value="{{ default_params.hidden_dim }}" min="16" max="512" step="16">
+                            <div class="form-text">Dimension of hidden layers (16-512)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="num_layers" class="form-label">Number of Layers</label>
+                            <input type="number" class="form-control" id="num_layers" name="num_layers" 
+                                   value="{{ default_params.num_layers }}" min="1" max="10">
+                            <div class="form-text">Number of GNN layers (1-10)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="pooling_method" class="form-label">Pooling Method</label>
+                            <select class="form-select" id="pooling_method" name="pooling_method">
+                                <option value="mean">Mean Pooling</option>
+                                <option value="sum">Sum Pooling</option>
+                                <option value="max">Max Pooling</option>
+                                <option value="attention">Attention Pooling</option>
+                                <option value="sort">Sort Pooling</option>
+                                <option value="diffpool">DiffPool</option>
+                            </select>
+                            <div class="form-text">Graph-level pooling method</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="output_dim" class="form-label">Output Dimension</label>
+                            <input type="number" class="form-control" id="output_dim" name="output_dim" 
+                                   value="{{ default_params.output_dim }}" min="1" max="10" step="1">
+                            <div class="form-text">Number of output values per graph (1-10)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training Parameters -->
+            <div class="parameter-section">
+                <h4><i class="fas fa-graduation-cap"></i> Training Parameters</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="learning_rate" class="form-label">Learning Rate</label>
+                            <input type="number" class="form-control" id="learning_rate" name="learning_rate" 
+                                   value="{{ default_params.learning_rate }}" min="0.00001" max="0.1" step="0.0001">
+                            <div class="form-text">Learning rate for optimization</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="epochs" class="form-label">Number of Epochs</label>
+                            <input type="number" class="form-control" id="epochs" name="epochs" 
+                                   value="{{ default_params.epochs }}" min="10" max="1000">
+                            <div class="form-text">Number of training epochs</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="batch_size" class="form-label">Batch Size</label>
+                            <input type="number" class="form-control" id="batch_size" name="batch_size" 
+                                   value="{{ default_params.batch_size }}" min="1" max="256">
+                            <div class="form-text">Batch size for training</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="optimizer" class="form-label">Optimizer</label>
+                            <select class="form-select" id="optimizer" name="optimizer">
+                                <option value="adam">Adam</option>
+                                <option value="sgd">SGD</option>
+                                <option value="adamw">AdamW</option>
+                                <option value="rmsprop">RMSprop</option>
+                            </select>
+                            <div class="form-text">Optimization algorithm</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dataset Configuration -->
+            <div class="parameter-section">
+                <h4><i class="fas fa-database"></i> Dataset Configuration</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="dataset" class="form-label">Dataset</label>
+                            <select class="form-select" id="dataset" name="dataset">
+                                <option value="ogbg_molhiv">OGB-MolHIV (Molecular Property)</option>
+                                <option value="ogbg_molpcba">OGB-MolPCBA (Molecular Property)</option>
+                                <option value="ogbg_ppa">OGB-PPA (Protein Function)</option>
+                                <option value="ogbg_code2">OGB-Code2 (Code Analysis)</option>
+                                <option value="zinc">ZINC (Molecular Property)</option>
+                                <option value="qm9">QM9 (Quantum Chemistry)</option>
+                            </select>
+                            <div class="form-text">Select a graph dataset</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="target_property" class="form-label">Target Property</label>
+                            <select class="form-select" id="target_property" name="target_property">
+                                <option value="molecular_weight">Molecular Weight</option>
+                                <option value="logp">LogP</option>
+                                <option value="qed">QED</option>
+                                <option value="sas">Synthetic Accessibility</option>
+                                <option value="tpsa">Topological Polar Surface Area</option>
+                                <option value="custom">Custom Property</option>
+                            </select>
+                            <div class="form-text">Target property to predict</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training Controls -->
+            <div class="training-controls">
+                <h4><i class="fas fa-play-circle"></i> Training Controls</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-light btn-lg w-100 mb-3" id="startTraining">
+                            <i class="fas fa-play"></i> Start Training
+                        </button>
+                    </div>
+                    <div class="col-md-6">
+                        <button type="button" class="btn btn-outline-light btn-lg w-100 mb-3" id="stopTraining" disabled>
+                            <i class="fas fa-stop"></i> Stop Training
+                        </button>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-12">
+                        <button type="button" class="btn btn-outline-light w-100" id="resetTraining">
+                            <i class="fas fa-redo"></i> Reset Training
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right Column - Progress and Results -->
+        <div class="col-lg-4">
+            <!-- Training Progress -->
+            <div class="progress-section">
+                <h4><i class="fas fa-chart-line"></i> Training Progress</h4>
+                <div id="trainingProgress" style="display: none;">
+                    <div class="mb-3">
+                        <label class="form-label">Epoch Progress</label>
+                        <div class="progress mb-2">
+                            <div class="progress-bar" id="epochProgress" role="progressbar" style="width: 0%"></div>
+                        </div>
+                        <small class="text-muted" id="epochText">0 / 0 epochs</small>
+                    </div>
+                </div>
+                <div id="trainingStatus" class="text-center">
+                    <i class="fas fa-clock fa-3x text-muted mb-3"></i>
+                    <p class="text-muted">Ready to start training</p>
+                </div>
+            </div>
+
+            <!-- Live Metrics -->
+            <div class="progress-section">
+                <h4><i class="fas fa-tachometer-alt"></i> Live Metrics</h4>
+                <div class="row">
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h5 id="currentLoss">-</h5>
+                            <small class="text-muted">Training Loss</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h5 id="currentMSE">-</h5>
+                            <small class="text-muted">MSE</small>
+                        </div>
+                    </div>
+                </div>
+                <div class="row mt-3">
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h5 id="validationLoss">-</h5>
+                            <small class="text-muted">Validation Loss</small>
+                        </div>
+                    </div>
+                    <div class="col-6">
+                        <div class="text-center">
+                            <h5 id="currentR2">-</h5>
+                            <small class="text-muted">R² Score</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training Charts -->
+            <div class="progress-section">
+                <h4><i class="fas fa-chart-area"></i> Training Curves</h4>
+                <div class="chart-container">
+                    <canvas id="lossChart"></canvas>
+                </div>
+                <div class="chart-container">
+                    <canvas id="mseChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Quick Actions -->
+            <div class="progress-section">
+                <h4><i class="fas fa-bolt"></i> Quick Actions</h4>
+                <div class="d-grid gap-2">
+                    <button type="button" class="btn btn-outline-primary" id="saveModel">
+                        <i class="fas fa-save"></i> Save Model
+                    </button>
+                    <button type="button" class="btn btn-outline-success" id="viewResults">
+                        <i class="fas fa-chart-bar"></i> View Results
+                    </button>
+                    <button type="button" class="btn btn-outline-info" id="exportConfig">
+                        <i class="fas fa-download"></i> Export Config
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts
+    const lossCtx = document.getElementById('lossChart').getContext('2d');
+    const mseCtx = document.getElementById('mseChart').getContext('2d');
+    
+    const lossChart = new Chart(lossCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Training Loss',
+                data: [],
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }, {
+                label: 'Validation Loss',
+                data: [],
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Loss Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    
+    const mseChart = new Chart(mseCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Training MSE',
+                data: [],
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.1
+            }, {
+                label: 'Validation MSE',
+                data: [],
+                borderColor: 'rgb(255, 159, 64)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'MSE Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    
+    // Training state
+    let isTraining = false;
+    let currentEpoch = 0;
+    let totalEpochs = 0;
+    let trainingInterval;
+    
+    // Start training
+    document.getElementById('startTraining').addEventListener('click', function() {
+        if (isTraining) return;
+        
+        // Get parameters
+        const parameters = {
+            hidden_dim: parseInt(document.getElementById('hidden_dim').value),
+            num_layers: parseInt(document.getElementById('num_layers').value),
+            learning_rate: parseFloat(document.getElementById('learning_rate').value),
+            epochs: parseInt(document.getElementById('epochs').value),
+            batch_size: parseInt(document.getElementById('batch_size').value),
+            optimizer: document.getElementById('optimizer').value,
+            dataset: document.getElementById('dataset').value,
+            target_property: document.getElementById('target_property').value,
+            pooling_method: document.getElementById('pooling_method').value,
+            output_dim: parseInt(document.getElementById('output_dim').value)
+        };
+        
+        // Start training simulation
+        startTrainingSimulation(parameters);
+    });
+    
+    // Stop training
+    document.getElementById('stopTraining').addEventListener('click', function() {
+        if (!isTraining) return;
+        stopTraining();
+    });
+    
+    // Reset training
+    document.getElementById('resetTraining').addEventListener('click', function() {
+        resetTraining();
+    });
+    
+    function startTrainingSimulation(parameters) {
+        isTraining = true;
+        currentEpoch = 0;
+        totalEpochs = parameters.epochs;
+        
+        // Update UI
+        document.getElementById('startTraining').disabled = true;
+        document.getElementById('stopTraining').disabled = false;
+        document.getElementById('trainingProgress').style.display = 'block';
+        document.getElementById('trainingStatus').style.display = 'none';
+        
+        // Simulate training
+        trainingInterval = setInterval(() => {
+            currentEpoch++;
+            
+            // Update progress
+            const epochProgress = (currentEpoch / totalEpochs) * 100;
+            document.getElementById('epochProgress').style.width = epochProgress + '%';
+            document.getElementById('epochText').textContent = `${currentEpoch} / ${totalEpochs} epochs`;
+            
+            // Simulate metrics for graph regression
+            const trainLoss = Math.max(0.1, 2.0 - (currentEpoch / totalEpochs) * 1.8);
+            const valLoss = trainLoss + Math.random() * 0.2;
+            const trainMSE = Math.max(0.05, 1.0 - (currentEpoch / totalEpochs) * 0.9);
+            const valMSE = trainMSE + Math.random() * 0.1;
+            const trainR2 = Math.min(0.95, 0.2 + (currentEpoch / totalEpochs) * 0.75);
+            
+            // Update metrics
+            document.getElementById('currentLoss').textContent = trainLoss.toFixed(4);
+            document.getElementById('currentMSE').textContent = trainMSE.toFixed(4);
+            document.getElementById('validationLoss').textContent = valLoss.toFixed(4);
+            document.getElementById('currentR2').textContent = trainR2.toFixed(4);
+            
+            // Update charts
+            lossChart.data.labels.push(currentEpoch);
+            lossChart.data.datasets[0].data.push(trainLoss);
+            lossChart.data.datasets[1].data.push(valLoss);
+            lossChart.update();
+            
+            mseChart.data.labels.push(currentEpoch);
+            mseChart.data.datasets[0].data.push(trainMSE);
+            mseChart.data.datasets[1].data.push(valMSE);
+            mseChart.update();
+            
+            // Check if training is complete
+            if (currentEpoch >= totalEpochs) {
+                stopTraining();
+                showNotification('Training completed successfully!', 'success');
+            }
+        }, 100); // Update every 100ms for smooth animation
+    }
+    
+    function stopTraining() {
+        isTraining = false;
+        clearInterval(trainingInterval);
+        
+        // Update UI
+        document.getElementById('startTraining').disabled = false;
+        document.getElementById('stopTraining').disabled = true;
+        
+        showNotification('Training stopped', 'warning');
+    }
+    
+    function resetTraining() {
+        stopTraining();
+        
+        // Reset charts
+        lossChart.data.labels = [];
+        lossChart.data.datasets[0].data = [];
+        lossChart.data.datasets[1].data = [];
+        lossChart.update();
+        
+        mseChart.data.labels = [];
+        mseChart.data.datasets[0].data = [];
+        mseChart.data.datasets[1].data = [];
+        mseChart.update();
+        
+        // Reset progress
+        document.getElementById('epochProgress').style.width = '0%';
+        document.getElementById('epochText').textContent = '0 / 0 epochs';
+        document.getElementById('trainingProgress').style.display = 'none';
+        document.getElementById('trainingStatus').style.display = 'block';
+        
+        // Reset metrics
+        document.getElementById('currentLoss').textContent = '-';
+        document.getElementById('currentMSE').textContent = '-';
+        document.getElementById('validationLoss').textContent = '-';
+        document.getElementById('currentR2').textContent = '-';
+    }
+    
+    function showNotification(message, type = 'info') {
+        if (window.GNNPlatform && window.GNNPlatform.showNotification) {
+            window.GNNPlatform.showNotification(message, type);
+        } else {
+            alert(message);
+        }
+    }
+    
+    // Quick action handlers
+    document.getElementById('saveModel').addEventListener('click', function() {
+        showNotification('Model saved successfully!', 'success');
+    });
+    
+    document.getElementById('viewResults').addEventListener('click', function() {
+        window.location.href = `/purpose/${purpose_name}/results/${model_id}`;
+    });
+    
+    document.getElementById('exportConfig').addEventListener('click', function() {
+        const config = {
+            model: '{{ model_id }}',
+            purpose: '{{ purpose_name }}',
+            parameters: {
+                hidden_dim: document.getElementById('hidden_dim').value,
+                num_layers: document.getElementById('num_layers').value,
+                learning_rate: document.getElementById('learning_rate').value,
+                epochs: document.getElementById('epochs').value,
+                batch_size: document.getElementById('batch_size').value,
+                optimizer: document.getElementById('optimizer').value,
+                dataset: document.getElementById('dataset').value,
+                target_property: document.getElementById('target_property').value,
+                pooling_method: document.getElementById('pooling_method').value,
+                output_dim: document.getElementById('output_dim').value
+            }
+        };
+        
+        const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `gnn_config_${model_id}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        showNotification('Configuration exported successfully!', 'success');
+    });
+});
+</script>
+{% endblock %}

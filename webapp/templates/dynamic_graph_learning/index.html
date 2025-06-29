@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Dynamic Graph Learning - GNN Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-clock"></i>
+                        Dynamic Graph Learning
+                    </h1>
+                    <p class="text-muted mb-0">Learn from evolving graphs and temporal patterns</p>
+                </div>
+                <div>
+                    <a href="/" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purpose Description -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i> About Dynamic Graph Learning
+                    </h5>
+                    <p class="card-text">
+                        Dynamic graph learning focuses on modeling graphs that evolve over time, capturing temporal 
+                        patterns, and making predictions about future graph states. This is essential for understanding 
+                        how networks change and evolve in real-world scenarios.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-lightbulb"></i> Applications:</h6>
+                            <ul>
+                                <li>Social network evolution modeling</li>
+                                <li>Temporal link prediction</li>
+                                <li>Dynamic community detection</li>
+                                <li>Time-series graph forecasting</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-cogs"></i> Key Features:</h6>
+                            <ul>
+                                <li>Temporal graph modeling</li>
+                                <li>Dynamic node/edge prediction</li>
+                                <li>Time-aware graph embeddings</li>
+                                <li>Evolution pattern learning</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Models -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4><i class="fas fa-brain"></i> Available Models</h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- DySAT -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-network-wired"></i> DySAT
+                    </h5>
+                    <p class="card-text">
+                        Dynamic self-attention network for learning temporal graph representations.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Sankar et al. (WSDM 2020)</p>
+                        <p><strong>Formula:</strong> Temporal attention with structural attention</p>
+                        <p><strong>Applications:</strong> Temporal graph representation learning</p>
+                    </div>
+                    <a href="/purpose/dynamic_graph_learning/experiment/dysat" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TGAT -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-eye"></i> TGAT
+                    </h5>
+                    <p class="card-text">
+                        Temporal graph attention network for learning time-aware node representations.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Xu et al. (ICLR 2020)</p>
+                        <p><strong>Formula:</strong> Temporal attention with time encoding</p>
+                        <p><strong>Applications:</strong> Time-aware node classification</p>
+                    </div>
+                    <a href="/purpose/dynamic_graph_learning/experiment/tgat" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- EvolveGCN -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-sitemap"></i> EvolveGCN
+                    </h5>
+                    <p class="card-text">
+                        Evolving graph convolutional network with recurrent neural networks for parameter evolution.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Pareja et al. (ICLR 2020)</p>
+                        <p><strong>Formula:</strong> W_t = GRU(W_{t-1}, ΔW_t)</p>
+                        <p><strong>Applications:</strong> Dynamic graph convolution</p>
+                    </div>
+                    <a href="/purpose/dynamic_graph_learning/experiment/evolvegcn" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- DyRep -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-clock"></i> DyRep
+                    </h5>
+                    <p class="card-text">
+                        Representation learning for dynamic graphs using temporal point processes.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Trivedi et al. (ICLR 2019)</p>
+                        <p><strong>Formula:</strong> Temporal point process modeling</p>
+                        <p><strong>Applications:</strong> Dynamic link prediction</p>
+                    </div>
+                    <a href="/purpose/dynamic_graph_learning/experiment/dyrep" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- JODIE -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-sync"></i> JODIE
+                    </h5>
+                    <p class="card-text">
+                        Joint dynamic representation learning for user-item interaction prediction.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Kumar et al. (KDD 2019)</p>
+                        <p><strong>Formula:</strong> Joint user-item temporal modeling</p>
+                        <p><strong>Applications:</strong> Dynamic recommendation systems</p>
+                    </div>
+                    <a href="/purpose/dynamic_graph_learning/experiment/jodie" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- TGN -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-history"></i> TGN
+                    </h5>
+                    <p class="card-text">
+                        Temporal graph network for learning dynamic graph representations with memory modules.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Rossi et al. (ICLR 2020)</p>
+                        <p><strong>Formula:</strong> Memory-augmented temporal modeling</p>
+                        <p><strong>Applications:</strong> Memory-based dynamic learning</p>
+                    </div>
+                    <a href="/purpose/dynamic_graph_learning/experiment/tgn" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">6</h5>
+                    <p class="card-text">Available Models</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Temporal</h5>
+                    <p class="card-text">Graph Modeling</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Evolution</h5>
+                    <p class="card-text">Pattern Learning</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">Future</h5>
+                    <p class="card-text">State Prediction</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.model-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e9ecef;
+}
+
+.model-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.model-details {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+}
+
+.model-details p {
+    margin-bottom: 0.5rem;
+}
+
+.card-title {
+    color: var(--primary);
+    font-weight: 600;
+}
+</style>
+{% endblock %}

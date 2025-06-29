@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Node Regression - GNN Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-chart-line"></i>
+                        Node Regression
+                    </h1>
+                    <p class="text-muted mb-0">Predict continuous values for nodes in graphs</p>
+                </div>
+                <div>
+                    <a href="/" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purpose Description -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i> About Node Regression
+                    </h5>
+                    <p class="card-text">
+                        Node regression tasks involve predicting continuous values for nodes in a graph. 
+                        This is useful for applications like predicting node properties, scores, or continuous 
+                        attributes based on the graph structure and node features.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-lightbulb"></i> Applications:</h6>
+                            <ul>
+                                <li>Predicting node scores or ratings</li>
+                                <li>Estimating continuous node properties</li>
+                                <li>Regression on graph-structured data</li>
+                                <li>Value prediction in social networks</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-cogs"></i> Key Features:</h6>
+                            <ul>
+                                <li>Continuous value prediction</li>
+                                <li>Graph-aware feature learning</li>
+                                <li>Multiple regression metrics</li>
+                                <li>Scalable to large graphs</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Models -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4><i class="fas fa-brain"></i> Available Models</h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- GCN -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-network-wired"></i> Graph Convolutional Network (GCN)
+                    </h5>
+                    <p class="card-text">
+                        Semi-supervised learning with graph convolutional layers for node regression tasks.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Kipf & Welling (ICLR 2017)</p>
+                        <p><strong>Formula:</strong> H(l+1) = σ(D̃^(-1/2)ÃD̃^(-1/2)H(l)W(l))</p>
+                        <p><strong>Applications:</strong> Node property prediction, score estimation</p>
+                    </div>
+                    <a href="/purpose/node_regression/experiment/gcn" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAT -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-eye"></i> Graph Attention Network (GAT)
+                    </h5>
+                    <p class="card-text">
+                        Attention-based graph neural network for learning node representations with weighted neighbor aggregation.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Veličković et al. (ICLR 2018)</p>
+                        <p><strong>Formula:</strong> α_ij = softmax(LeakyReLU(a^T[Wh_i||Wh_j]))</p>
+                        <p><strong>Applications:</strong> Attention-based regression, interpretable predictions</p>
+                    </div>
+                    <a href="/purpose/node_regression/experiment/gat" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- GraphSAGE -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-sitemap"></i> GraphSAGE
+                    </h5>
+                    <p class="card-text">
+                        Inductive framework for learning node representations by sampling and aggregating neighbor features.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Hamilton et al. (NeurIPS 2017)</p>
+                        <p><strong>Formula:</strong> h_v^k = σ(W^k · CONCAT(h_v^{k-1}, AGG({h_u^{k-1}})))</p>
+                        <p><strong>Applications:</strong> Large-scale regression, inductive learning</p>
+                    </div>
+                    <a href="/purpose/node_regression/experiment/graphsage" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- GIN -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-cube"></i> Graph Isomorphism Network (GIN)
+                    </h5>
+                    <p class="card-text">
+                        Provably powerful graph neural network that can distinguish different graph structures.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Xu et al. (ICLR 2019)</p>
+                        <p><strong>Formula:</strong> h_v^(k) = MLP^(k)((1 + ε^(k)) · h_v^(k-1) + Σ_u∈N(v) h_u^(k-1))</p>
+                        <p><strong>Applications:</strong> Structural regression, graph-aware prediction</p>
+                    </div>
+                    <a href="/purpose/node_regression/experiment/gin" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- ChebNet -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-wave-square"></i> Chebyshev Network (ChebNet)
+                    </h5>
+                    <p class="card-text">
+                        Spectral graph convolution using Chebyshev polynomials for efficient graph filtering.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Defferrard et al. (NeurIPS 2016)</p>
+                        <p><strong>Formula:</strong> g_θ * x = Σ_k=0^K θ_k T_k(L̃)x</p>
+                        <p><strong>Applications:</strong> Spectral regression, efficient convolution</p>
+                    </div>
+                    <a href="/purpose/node_regression/experiment/chebnet" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- APPNP -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-random"></i> Approximate Personalized Propagation (APPNP)
+                    </h5>
+                    <p class="card-text">
+                        Combines neural networks with personalized PageRank for scalable node regression.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Klicpera et al. (ICLR 2019)</p>
+                        <p><strong>Formula:</strong> Z = (1-α) · MLP(X) + α · D^(-1/2)AD^(-1/2)Z</p>
+                        <p><strong>Applications:</strong> Scalable regression, personalized prediction</p>
+                    </div>
+                    <a href="/purpose/node_regression/experiment/appnp" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">6</h5>
+                    <p class="card-text">Available Models</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Continuous</h5>
+                    <p class="card-text">Value Prediction</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Graph-aware</h5>
+                    <p class="card-text">Feature Learning</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">Scalable</h5>
+                    <p class="card-text">Large Networks</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.model-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e9ecef;
+}
+
+.model-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.model-details {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+}
+
+.model-details p {
+    margin-bottom: 0.5rem;
+}
+
+.card-title {
+    color: var(--primary);
+    font-weight: 600;
+}
+</style>
+{% endblock %}

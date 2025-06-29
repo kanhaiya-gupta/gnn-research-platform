@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}GNN Platform{% endblock %}</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', path='css/main.css') }}">
+    
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    {% block extra_head %}{% endblock %}
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">
+                <i class="fas fa-project-diagram"></i>
+                GNN Platform
+            </a>
+            
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="/">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="nodeDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-circle"></i> Node Tasks
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/purpose/node_tasks.classification">Classification</a></li>
+                            <li><a class="dropdown-item" href="/purpose/node_tasks.regression">Regression</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="edgeDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-link"></i> Edge Tasks
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/purpose/edge_tasks.classification">Classification</a></li>
+                            <li><a class="dropdown-item" href="/purpose/edge_tasks.link_prediction">Link Prediction</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" id="graphDropdown" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-project-diagram"></i> Graph Tasks
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="/purpose/graph_tasks.classification">Classification</a></li>
+                            <li><a class="dropdown-item" href="/purpose/graph_tasks.regression">Regression</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/purpose/community_detection">
+                            <i class="fas fa-users"></i> Community Detection
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="/purpose/anomaly_detection">
+                            <i class="fas fa-exclamation-triangle"></i> Anomaly Detection
+                        </a>
+                    </li>
+                </ul>
+                
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">
+                            <i class="fas fa-question-circle"></i> Help
+                        </a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer bg-dark text-light py-4 mt-5">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Graph Neural Network Platform</h5>
+                    <p>Comprehensive platform for GNN research and applications</p>
+                </div>
+                <div class="col-md-6 text-end">
+                    <p>&copy; 2024 GNN Platform. Built with FastAPI and Bootstrap.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Help Modal -->
+    <div class="modal fade" id="helpModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-question-circle"></i> GNN Platform Help
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6>Getting Started</h6>
+                    <ol>
+                        <li>Choose a GNN application from the dashboard</li>
+                        <li>Select a model architecture (GCN, GAT, GraphSAGE, etc.)</li>
+                        <li>Configure parameters and hyperparameters</li>
+                        <li>Upload or select a dataset</li>
+                        <li>Start training and monitor progress</li>
+                        <li>Analyze results and visualize outputs</li>
+                    </ol>
+                    
+                    <h6>Supported Tasks</h6>
+                    <ul>
+                        <li><strong>Node Tasks:</strong> Classification and regression on graph nodes</li>
+                        <li><strong>Edge Tasks:</strong> Classification and link prediction on graph edges</li>
+                        <li><strong>Graph Tasks:</strong> Classification and regression on entire graphs</li>
+                        <li><strong>Community Detection:</strong> Find communities and clusters</li>
+                        <li><strong>Anomaly Detection:</strong> Detect anomalous nodes/edges/graphs</li>
+                        <li><strong>Graph Generation:</strong> Generate new graphs</li>
+                        <li><strong>Graph Embedding:</strong> Learn low-dimensional representations</li>
+                        <li><strong>Dynamic Graphs:</strong> Handle temporal graphs</li>
+                        <li><strong>Multi-Relational:</strong> Handle heterogeneous graphs</li>
+                    </ul>
+                    
+                    <h6>Popular Models</h6>
+                    <ul>
+                        <li><strong>GCN:</strong> Graph Convolutional Network - foundational model</li>
+                        <li><strong>GAT:</strong> Graph Attention Network - attention-based</li>
+                        <li><strong>GraphSAGE:</strong> Inductive learning on large graphs</li>
+                        <li><strong>GIN:</strong> Graph Isomorphism Network - maximally powerful</li>
+                        <li><strong>GAE:</strong> Graph Autoencoder - unsupervised learning</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JS -->
+    <script src="{{ url_for('static', path='js/main.js') }}"></script>
+    
+    {% block extra_scripts %}{% endblock %}
+</body>
+</html> 

@@ -1,0 +1,421 @@
+{% extends "base.html" %}
+
+{% block title %}{{ model.name }} Results - Anomaly Detection{% endblock %}
+
+{% block extra_head %}
+<style>
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .metric-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .results-summary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .anomaly-table {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .table th {
+        background: #f8f9fa;
+        border-top: none;
+        font-weight: 600;
+    }
+    
+    .anomaly-score {
+        font-weight: bold;
+    }
+    
+    .anomaly-high {
+        color: #dc3545;
+    }
+    
+    .anomaly-medium {
+        color: #ffc107;
+    }
+    
+    .anomaly-low {
+        color: #28a745;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-chart-bar"></i>
+                        {{ model.name }} Results
+                    </h1>
+                    <p class="text-muted mb-0">Anomaly Detection - {{ dataset_name }}</p>
+                </div>
+                <div>
+                    <a href="/purpose/anomaly_detection" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Anomaly Detection
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="results-summary">
+        <div class="row">
+            <div class="col-md-8">
+                <h4><i class="fas fa-trophy"></i> Experiment Summary</h4>
+                <p class="mb-0">
+                    Successfully completed anomaly detection experiment using {{ model.name }} on {{ dataset_name }}. 
+                    The model identified {{ total_anomalies }} anomalies out of {{ total_nodes }} nodes with high precision.
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="d-flex flex-column">
+                    <span class="h5 mb-0">Training Time</span>
+                    <span class="h4 mb-0">{{ training_time }}</span>
+                    <small>seconds</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4><i class="fas fa-tachometer-alt"></i> Performance Metrics</h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+                <div class="metric-value text-primary">{{ metrics.precision|round(4) }}</div>
+                <div class="metric-label">Precision</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+                <div class="metric-value text-success">{{ metrics.recall|round(4) }}</div>
+                <div class="metric-label">Recall</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+                <div class="metric-value text-info">{{ metrics.f1_score|round(4) }}</div>
+                <div class="metric-label">F1 Score</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+                <div class="metric-value text-warning">{{ metrics.auroc|round(4) }}</div>
+                <div class="metric-label">AUROC</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Curves -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h5><i class="fas fa-chart-line"></i> Training Loss</h5>
+                <canvas id="lossChart" height="300"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h5><i class="fas fa-chart-line"></i> Validation Loss</h5>
+                <canvas id="valLossChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Anomaly Score Distribution -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <h5><i class="fas fa-chart-bar"></i> Anomaly Score Distribution</h5>
+                <canvas id="scoreDistributionChart" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- ROC Curve -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <h5><i class="fas fa-chart-area"></i> ROC Curve</h5>
+                <canvas id="rocChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Detected Anomalies -->
+    <div class="row">
+        <div class="col-12">
+            <div class="anomaly-table">
+                <h5><i class="fas fa-table"></i> Top Detected Anomalies</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Node ID</th>
+                                <th>Anomaly Score</th>
+                                <th>Anomaly Level</th>
+                                <th>Node Features</th>
+                                <th>Degree</th>
+                                <th>Clustering Coefficient</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(10) %}
+                            <tr>
+                                <td>{{ detected_anomalies[i].node_id }}</td>
+                                <td>
+                                    <span class="anomaly-score 
+                                        {% if detected_anomalies[i].anomaly_score > 0.7 %}anomaly-high
+                                        {% elif detected_anomalies[i].anomaly_score > 0.4 %}anomaly-medium
+                                        {% else %}anomaly-low{% endif %}">
+                                        {{ detected_anomalies[i].anomaly_score|round(4) }}
+                                    </span>
+                                </td>
+                                <td>
+                                    {% if detected_anomalies[i].anomaly_score > 0.7 %}
+                                        <span class="badge bg-danger">High</span>
+                                    {% elif detected_anomalies[i].anomaly_score > 0.4 %}
+                                        <span class="badge bg-warning">Medium</span>
+                                    {% else %}
+                                        <span class="badge bg-success">Low</span>
+                                    {% endif %}
+                                </td>
+                                <td>{{ detected_anomalies[i].features|join(', ') }}</td>
+                                <td>{{ detected_anomalies[i].degree }}</td>
+                                <td>{{ detected_anomalies[i].clustering_coeff|round(4) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Configuration -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <h5><i class="fas fa-cogs"></i> Model Configuration</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Architecture Parameters</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Hidden Dimension:</strong> {{ config.hidden_dim }}</li>
+                            <li><strong>Number of Layers:</strong> {{ config.num_layers }}</li>
+                            <li><strong>Dropout Rate:</strong> {{ config.dropout }}</li>
+                            <li><strong>Activation Function:</strong> {{ config.activation }}</li>
+                            <li><strong>Anomaly Threshold:</strong> {{ config.anomaly_threshold }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Training Parameters</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Learning Rate:</strong> {{ config.learning_rate }}</li>
+                            <li><strong>Epochs:</strong> {{ config.epochs }}</li>
+                            <li><strong>Batch Size:</strong> {{ config.batch_size }}</li>
+                            <li><strong>Optimizer:</strong> {{ config.optimizer }}</li>
+                            <li><strong>Loss Function:</strong> {{ config.loss_function }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Training Loss Chart
+    const lossCtx = document.getElementById('lossChart').getContext('2d');
+    new Chart(lossCtx, {
+        type: 'line',
+        data: {
+            labels: {{ training_epochs|tojson }},
+            datasets: [{
+                label: 'Training Loss',
+                data: {{ training_loss|tojson }},
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Training Loss Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Validation Loss Chart
+    const valLossCtx = document.getElementById('valLossChart').getContext('2d');
+    new Chart(valLossCtx, {
+        type: 'line',
+        data: {
+            labels: {{ validation_epochs|tojson }},
+            datasets: [{
+                label: 'Validation Loss',
+                data: {{ validation_loss|tojson }},
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Validation Loss Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Anomaly Score Distribution Chart
+    const scoreCtx = document.getElementById('scoreDistributionChart').getContext('2d');
+    new Chart(scoreCtx, {
+        type: 'histogram',
+        data: {
+            datasets: [{
+                label: 'Anomaly Score Distribution',
+                data: {{ anomaly_scores|tojson }},
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgb(54, 162, 235)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Distribution of Anomaly Scores'
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Anomaly Score'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Frequency'
+                    }
+                }
+            }
+        }
+    });
+
+    // ROC Curve Chart
+    const rocCtx = document.getElementById('rocChart').getContext('2d');
+    new Chart(rocCtx, {
+        type: 'line',
+        data: {
+            labels: {{ roc_fpr|tojson }},
+            datasets: [{
+                label: 'ROC Curve',
+                data: {{ roc_tpr|tojson }},
+                borderColor: 'rgb(255, 159, 64)',
+                backgroundColor: 'rgba(255, 159, 64, 0.1)',
+                tension: 0.1,
+                fill: false
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'ROC Curve'
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'False Positive Rate'
+                    },
+                    min: 0,
+                    max: 1
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'True Positive Rate'
+                    },
+                    min: 0,
+                    max: 1
+                }
+            }
+        }
+    });
+});
+</script>
+{% endblock %}

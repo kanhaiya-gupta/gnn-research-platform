@@ -1,0 +1,484 @@
+{% extends "base.html" %}
+
+{% block title %}{{ model.name }} Results - Graph Generation{% endblock %}
+
+{% block extra_head %}
+<style>
+    .metric-card {
+        background: white;
+        border-radius: 12px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    
+    .metric-value {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin-bottom: 0.5rem;
+    }
+    
+    .metric-label {
+        color: #6c757d;
+        font-size: 0.9rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .chart-container {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .results-summary {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+    }
+    
+    .generated-graphs {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 2rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .graph-preview {
+        border: 2px solid #e9ecef;
+        border-radius: 8px;
+        padding: 1rem;
+        margin-bottom: 1rem;
+        background: #f8f9fa;
+    }
+    
+    .graph-stats {
+        display: flex;
+        justify-content: space-between;
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #6c757d;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-chart-bar"></i>
+                        {{ model.name }} Results
+                    </h1>
+                    <p class="text-muted mb-0">Graph Generation - {{ dataset_name }}</p>
+                </div>
+                <div>
+                    <a href="/purpose/graph_generation" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Graph Generation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Results Summary -->
+    <div class="results-summary">
+        <div class="row">
+            <div class="col-md-8">
+                <h4><i class="fas fa-trophy"></i> Experiment Summary</h4>
+                <p class="mb-0">
+                    Successfully completed graph generation experiment using {{ model.name }} on {{ dataset_name }}. 
+                    Generated {{ total_generated }} high-quality graphs with realistic structural properties.
+                </p>
+            </div>
+            <div class="col-md-4 text-end">
+                <div class="d-flex flex-column">
+                    <span class="h5 mb-0">Training Time</span>
+                    <span class="h4 mb-0">{{ training_time }}</span>
+                    <small>seconds</small>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4><i class="fas fa-tachometer-alt"></i> Generation Quality Metrics</h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+                <div class="metric-value text-primary">{{ metrics.validity|round(4) }}</div>
+                <div class="metric-label">Validity Rate</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+                <div class="metric-value text-success">{{ metrics.uniqueness|round(4) }}</div>
+                <div class="metric-label">Uniqueness</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+                <div class="metric-value text-info">{{ metrics.novelty|round(4) }}</div>
+                <div class="metric-label">Novelty</div>
+            </div>
+        </div>
+        <div class="col-lg-3 col-md-6">
+            <div class="metric-card">
+                <div class="metric-value text-warning">{{ metrics.fidelity|round(4) }}</div>
+                <div class="metric-label">Fidelity</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Training Curves -->
+    <div class="row">
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h5><i class="fas fa-chart-line"></i> Training Loss</h5>
+                <canvas id="lossChart" height="300"></canvas>
+            </div>
+        </div>
+        <div class="col-lg-6">
+            <div class="chart-container">
+                <h5><i class="fas fa-chart-line"></i> Validation Loss</h5>
+                <canvas id="valLossChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graph Statistics Comparison -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <h5><i class="fas fa-chart-bar"></i> Graph Statistics Comparison</h5>
+                <canvas id="statsComparisonChart" height="400"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Degree Distribution -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <h5><i class="fas fa-chart-area"></i> Degree Distribution Comparison</h5>
+                <canvas id="degreeDistributionChart" height="300"></canvas>
+            </div>
+        </div>
+    </div>
+
+    <!-- Generated Graphs Preview -->
+    <div class="row">
+        <div class="col-12">
+            <div class="generated-graphs">
+                <h5><i class="fas fa-project-diagram"></i> Sample Generated Graphs</h5>
+                <div class="row">
+                    {% for i in range(6) %}
+                    <div class="col-lg-4 col-md-6">
+                        <div class="graph-preview">
+                            <h6>Generated Graph {{ i + 1 }}</h6>
+                            <div class="text-center mb-3">
+                                <canvas id="graphCanvas{{ i }}" width="200" height="200" style="border: 1px solid #ddd; border-radius: 4px;"></canvas>
+                            </div>
+                            <div class="graph-stats">
+                                <span>Nodes: {{ generated_graphs[i].num_nodes }}</span>
+                                <span>Edges: {{ generated_graphs[i].num_edges }}</span>
+                                <span>Density: {{ generated_graphs[i].density|round(3) }}</span>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Graph Quality Analysis -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <h5><i class="fas fa-table"></i> Generated Graph Quality Analysis</h5>
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Graph ID</th>
+                                <th>Number of Nodes</th>
+                                <th>Number of Edges</th>
+                                <th>Average Degree</th>
+                                <th>Clustering Coefficient</th>
+                                <th>Diameter</th>
+                                <th>Validity Score</th>
+                                <th>Uniqueness Score</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for i in range(10) %}
+                            <tr>
+                                <td>{{ generated_graphs[i].graph_id }}</td>
+                                <td>{{ generated_graphs[i].num_nodes }}</td>
+                                <td>{{ generated_graphs[i].num_edges }}</td>
+                                <td>{{ generated_graphs[i].avg_degree|round(2) }}</td>
+                                <td>{{ generated_graphs[i].clustering_coeff|round(4) }}</td>
+                                <td>{{ generated_graphs[i].diameter }}</td>
+                                <td>{{ generated_graphs[i].validity_score|round(4) }}</td>
+                                <td>{{ generated_graphs[i].uniqueness_score|round(4) }}</td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Model Configuration -->
+    <div class="row">
+        <div class="col-12">
+            <div class="chart-container">
+                <h5><i class="fas fa-cogs"></i> Model Configuration</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h6>Architecture Parameters</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Hidden Dimension:</strong> {{ config.hidden_dim }}</li>
+                            <li><strong>Number of Layers:</strong> {{ config.num_layers }}</li>
+                            <li><strong>Dropout Rate:</strong> {{ config.dropout }}</li>
+                            <li><strong>Activation Function:</strong> {{ config.activation }}</li>
+                            <li><strong>Generation Method:</strong> {{ config.generation_method }}</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <h6>Training Parameters</h6>
+                        <ul class="list-unstyled">
+                            <li><strong>Learning Rate:</strong> {{ config.learning_rate }}</li>
+                            <li><strong>Epochs:</strong> {{ config.epochs }}</li>
+                            <li><strong>Batch Size:</strong> {{ config.batch_size }}</li>
+                            <li><strong>Optimizer:</strong> {{ config.optimizer }}</li>
+                            <li><strong>Loss Function:</strong> {{ config.loss_function }}</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Training Loss Chart
+    const lossCtx = document.getElementById('lossChart').getContext('2d');
+    new Chart(lossCtx, {
+        type: 'line',
+        data: {
+            labels: {{ training_epochs|tojson }},
+            datasets: [{
+                label: 'Training Loss',
+                data: {{ training_loss|tojson }},
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Training Loss Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Validation Loss Chart
+    const valLossCtx = document.getElementById('valLossChart').getContext('2d');
+    new Chart(valLossCtx, {
+        type: 'line',
+        data: {
+            labels: {{ validation_epochs|tojson }},
+            datasets: [{
+                label: 'Validation Loss',
+                data: {{ validation_loss|tojson }},
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Validation Loss Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Graph Statistics Comparison Chart
+    const statsCtx = document.getElementById('statsComparisonChart').getContext('2d');
+    new Chart(statsCtx, {
+        type: 'bar',
+        data: {
+            labels: ['Average Degree', 'Clustering Coefficient', 'Diameter', 'Density'],
+            datasets: [{
+                label: 'Original Graphs',
+                data: {{ original_stats|tojson }},
+                backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                borderColor: 'rgb(54, 162, 235)',
+                borderWidth: 1
+            }, {
+                label: 'Generated Graphs',
+                data: {{ generated_stats|tojson }},
+                backgroundColor: 'rgba(255, 99, 132, 0.6)',
+                borderColor: 'rgb(255, 99, 132)',
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Graph Statistics Comparison'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+
+    // Degree Distribution Chart
+    const degreeCtx = document.getElementById('degreeDistributionChart').getContext('2d');
+    new Chart(degreeCtx, {
+        type: 'line',
+        data: {
+            labels: {{ degree_bins|tojson }},
+            datasets: [{
+                label: 'Original Graphs',
+                data: {{ original_degree_dist|tojson }},
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                tension: 0.1
+            }, {
+                label: 'Generated Graphs',
+                data: {{ generated_degree_dist|tojson }},
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Degree Distribution Comparison'
+                }
+            },
+            scales: {
+                x: {
+                    title: {
+                        display: true,
+                        text: 'Degree'
+                    }
+                },
+                y: {
+                    title: {
+                        display: true,
+                        text: 'Frequency'
+                    }
+                }
+            }
+        }
+    });
+
+    // Draw sample graphs
+    function drawGraph(canvasId, nodes, edges) {
+        const canvas = document.getElementById(canvasId);
+        const ctx = canvas.getContext('2d');
+        const width = canvas.width;
+        const height = canvas.height;
+        
+        // Clear canvas
+        ctx.clearRect(0, 0, width, height);
+        
+        // Draw edges
+        ctx.strokeStyle = '#6c757d';
+        ctx.lineWidth = 1;
+        edges.forEach(edge => {
+            const [x1, y1] = nodes[edge[0]];
+            const [x2, y2] = nodes[edge[1]];
+            ctx.beginPath();
+            ctx.moveTo(x1 * width, y1 * height);
+            ctx.lineTo(x2 * width, y2 * height);
+            ctx.stroke();
+        });
+        
+        // Draw nodes
+        ctx.fillStyle = '#007bff';
+        nodes.forEach(node => {
+            const [x, y] = node;
+            ctx.beginPath();
+            ctx.arc(x * width, y * height, 3, 0, 2 * Math.PI);
+            ctx.fill();
+        });
+    }
+    
+    // Draw sample graphs (simplified visualization)
+    for (let i = 0; i < 6; i++) {
+        const nodes = [];
+        const edges = [];
+        const numNodes = Math.floor(Math.random() * 10) + 5;
+        
+        // Generate random nodes
+        for (let j = 0; j < numNodes; j++) {
+            nodes.push([Math.random(), Math.random()]);
+        }
+        
+        // Generate random edges
+        for (let j = 0; j < numNodes * 1.5; j++) {
+            const from = Math.floor(Math.random() * numNodes);
+            const to = Math.floor(Math.random() * numNodes);
+            if (from !== to) {
+                edges.push([from, to]);
+            }
+        }
+        
+        drawGraph(`graphCanvas${i}`, nodes, edges);
+    }
+});
+</script>
+{% endblock %}

@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+{% block title %}Anomaly Detection - GNN Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        Anomaly Detection
+                    </h1>
+                    <p class="text-muted mb-0">Detect anomalous nodes, edges, or subgraphs in networks</p>
+                </div>
+                <div>
+                    <a href="/" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purpose Description -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i> About Anomaly Detection
+                    </h5>
+                    <p class="card-text">
+                        Anomaly detection in graphs involves identifying unusual patterns, nodes, edges, or subgraphs 
+                        that deviate from normal behavior. This is crucial for detecting fraud, network intrusions, 
+                        and other suspicious activities in graph-structured data.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-lightbulb"></i> Applications:</h6>
+                            <ul>
+                                <li>Fraud detection in financial networks</li>
+                                <li>Network intrusion detection</li>
+                                <li>Social network spam detection</li>
+                                <li>Anomalous pattern identification</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-cogs"></i> Key Features:</h6>
+                            <ul>
+                                <li>Node-level anomaly detection</li>
+                                <li>Edge-level anomaly detection</li>
+                                <li>Subgraph-level anomaly detection</li>
+                                <li>Real-time monitoring capabilities</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Models -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4><i class="fas fa-brain"></i> Available Models</h4>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- GCN-AE -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-network-wired"></i> GCN Autoencoder
+                    </h5>
+                    <p class="card-text">
+                        Graph convolutional autoencoder for detecting anomalies through reconstruction error.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Kipf & Welling (ICLR 2017)</p>
+                        <p><strong>Formula:</strong> Reconstruction Error = ||X - X̂||²</p>
+                        <p><strong>Applications:</strong> Node anomaly detection, reconstruction-based</p>
+                    </div>
+                    <a href="/purpose/anomaly_detection/experiment/gcn_ae" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- GAT-AE -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-eye"></i> GAT Autoencoder
+                    </h5>
+                    <p class="card-text">
+                        Graph attention autoencoder with attention mechanisms for anomaly detection.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Veličković et al. (ICLR 2018)</p>
+                        <p><strong>Formula:</strong> α_ij = softmax(LeakyReLU(a^T[Wh_i||Wh_j]))</p>
+                        <p><strong>Applications:</strong> Attention-based anomaly detection</p>
+                    </div>
+                    <a href="/purpose/anomaly_detection/experiment/gat_ae" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- DOMINANT -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-search"></i> DOMINANT
+                    </h5>
+                    <p class="card-text">
+                        Deep anomaly detection on attributed networks using dual autoencoders.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Ding et al. (WWW 2019)</p>
+                        <p><strong>Formula:</strong> Anomaly Score = α·Rec_attr + β·Rec_struc</p>
+                        <p><strong>Applications:</strong> Attributed network anomaly detection</p>
+                    </div>
+                    <a href="/purpose/anomaly_detection/experiment/dominant" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- AnomalyDAE -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-bug"></i> AnomalyDAE
+                    </h5>
+                    <p class="card-text">
+                        Adversarial anomaly detection on attributed networks with dual autoencoders.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Fan et al. (KDD 2020)</p>
+                        <p><strong>Formula:</strong> Adversarial training with dual autoencoders</p>
+                        <p><strong>Applications:</strong> Adversarial anomaly detection</p>
+                    </div>
+                    <a href="/purpose/anomaly_detection/experiment/anomalydae" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- GANomaly -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-magic"></i> GANomaly
+                    </h5>
+                    <p class="card-text">
+                        Generative adversarial network for anomaly detection in graph data.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Akcay et al. (ICPR 2018)</p>
+                        <p><strong>Formula:</strong> GAN-based anomaly score computation</p>
+                        <p><strong>Applications:</strong> GAN-based anomaly detection</p>
+                    </div>
+                    <a href="/purpose/anomaly_detection/experiment/ganomaly" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- GraphSAGE-AE -->
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-sitemap"></i> GraphSAGE Autoencoder
+                    </h5>
+                    <p class="card-text">
+                        Inductive anomaly detection using GraphSAGE with autoencoder architecture.
+                    </p>
+                    <div class="model-details">
+                        <p><strong>Paper:</strong> Hamilton et al. (NeurIPS 2017)</p>
+                        <p><strong>Formula:</strong> h_v^k = σ(W^k · CONCAT(h_v^{k-1}, AGG({h_u^{k-1}})))</p>
+                        <p><strong>Applications:</strong> Inductive anomaly detection</p>
+                    </div>
+                    <a href="/purpose/anomaly_detection/experiment/graphsage_ae" class="btn btn-primary">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Quick Stats -->
+    <div class="row mt-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-primary">6</h5>
+                    <p class="card-text">Available Models</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-success">Multi-level</h5>
+                    <p class="card-text">Anomaly Detection</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-info">Real-time</h5>
+                    <p class="card-text">Monitoring</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h5 class="card-title text-warning">Robust</h5>
+                    <p class="card-text">Detection Methods</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.model-card {
+    transition: transform 0.2s, box-shadow 0.2s;
+    border: 1px solid #e9ecef;
+}
+
+.model-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+}
+
+.model-details {
+    background: #f8f9fa;
+    padding: 1rem;
+    border-radius: 8px;
+    margin: 1rem 0;
+    font-size: 0.9rem;
+}
+
+.model-details p {
+    margin-bottom: 0.5rem;
+}
+
+.card-title {
+    color: var(--primary);
+    font-weight: 600;
+}
+</style>
+{% endblock %}
