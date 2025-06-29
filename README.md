@@ -8,39 +8,34 @@ The GNN Platform is a sophisticated web interface that enables researchers and p
 
 ## 🎯 GNN Applications & Purposes
 
-The platform supports the following GNN applications with **complete backend implementations**:
+The platform supports the following GNN applications with **[complete backend implementations](docs/README_BACKEND.md)**:
 
 ### ✅ Node Tasks
-- **Node Classification**: Classify nodes into different categories
-- **Node Regression**: Predict continuous values for nodes
+- **[Node Classification](docs/node_classification.md)** - Classify nodes into different categories
+- **[Node Regression](docs/node_regression.md)** - Predict continuous values for nodes
 
 ### ✅ Edge Tasks  
-- **Edge Classification**: Classify edges into different types
-- **Link Prediction**: Predict missing or future edges
+- **[Edge Classification](docs/edge_classification.md)** - Classify edges into different types
+- **[Link Prediction](docs/link_prediction.md)** - Predict missing or future edges
 
 ### ✅ Graph Tasks
-- **Graph Classification**: Classify entire graphs into categories
-- **Graph Regression**: Predict continuous values for entire graphs
+- **[Graph Classification](docs/graph_classification.md)** - Classify entire graphs into categories
+- **[Graph Regression](docs/graph_regression.md)** - Predict continuous values for entire graphs
 
 ### ✅ Community Detection
-- Discover communities and clusters in graphs
-- Modularity optimization with GNN embeddings
+- **[Community Detection](docs/community_detection.md)** - Discover communities and clusters in graphs
 
 ### ✅ Anomaly Detection
-- Detect anomalous nodes, edges, or subgraphs
-- Unsupervised and supervised approaches
+- **[Anomaly Detection](docs/anomaly_detection.md)** - Detect anomalous nodes, edges, or subgraphs
 
 ### ✅ Graph Generation
-- Generate new graphs with desired properties
-- Variational and sequential generation methods
+- **[Graph Generation](docs/graph_generation.md)** - Generate new graphs with desired properties
 
 ### ✅ Graph Embedding & Visualization
-- Learn low-dimensional graph representations
-- Interactive visualization of embeddings with 6+ dimensionality reduction methods
+- **[Graph Embedding Visualization](docs/graph_embedding_visualization.md)** - Learn low-dimensional graph representations
 
 ### ✅ Dynamic Graph Learning
-- Handle temporal and evolving graphs
-- Time-aware graph neural networks
+- **[Dynamic Graph Learning](docs/dynamic_graph_learning.md)** - Handle temporal and evolving graphs
 
 ## 🧠 Supported GNN Models
 
@@ -136,9 +131,7 @@ The platform supports the following GNN applications with **complete backend imp
 
 2. **Install dependencies**:
    ```bash
-   pip install torch torch-geometric fastapi uvicorn jinja2 httpx
-   pip install scikit-learn matplotlib seaborn plotly umap-learn
-   pip install networkx scipy pandas
+   pip install -r requirements.txt
    ```
 
 3. **Start the platform**:
@@ -153,6 +146,8 @@ The platform supports the following GNN applications with **complete backend imp
 4. **Access the application**:
    - Frontend: http://localhost:5000
    - Backend API: http://localhost:8001
+
+For detailed installation instructions, see [INSTALL.md](INSTALL.md).
 
 ## 🎮 Usage
 
@@ -229,6 +224,26 @@ Each GNN task has its own configuration system:
 - `experiment_complete`: Training completion notification
 - `error_occurred`: Error handling and reporting
 
+## 📚 Documentation
+
+### Backend Documentation
+- **[Backend Overview](docs/README_BACKEND.md)**: Complete backend implementation guide with all 12 GNN tasks
+- **[Task-Specific Docs](docs/)**: Detailed documentation for each GNN task
+- **[API Reference](docs/)**: Backend API documentation
+
+### Task Documentation
+- [Node Classification](docs/node_classification.md) - Multi-class classification for nodes
+- [Node Regression](docs/node_regression.md) - Continuous value prediction for nodes
+- [Edge Classification](docs/edge_classification.md) - Classifying edge types
+- [Link Prediction](docs/link_prediction.md) - Predicting missing edges
+- [Graph Classification](docs/graph_classification.md) - Classifying entire graphs
+- [Graph Regression](docs/graph_regression.md) - Predicting graph-level properties
+- [Community Detection](docs/community_detection.md) - Detecting communities in graphs
+- [Anomaly Detection](docs/anomaly_detection.md) - Detecting anomalous nodes/edges
+- [Graph Generation](docs/graph_generation.md) - Generating new graphs
+- [Graph Embedding Visualization](docs/graph_embedding_visualization.md) - Learning and visualizing graph embeddings
+- [Dynamic Graph Learning](docs/dynamic_graph_learning.md) - Learning from evolving graphs
+
 ## 🎨 Design Philosophy
 
 ### User Experience
@@ -269,26 +284,6 @@ Each GNN task has its own configuration system:
 - User-item interaction modeling
 - Collaborative filtering with graph structures
 - Multi-modal recommendation
-
-## 📚 Documentation
-
-### Backend Documentation
-- **[Backend Overview](docs/README_BACKEND.md)**: Complete backend implementation guide
-- **[Task-Specific Docs](docs/)**: Detailed documentation for each GNN task
-- **[API Reference](docs/)**: Backend API documentation
-
-### Task Documentation
-- [Node Classification](docs/node_classification.md)
-- [Node Regression](docs/node_regression.md)
-- [Edge Classification](docs/edge_classification.md)
-- [Link Prediction](docs/link_prediction.md)
-- [Graph Classification](docs/graph_classification.md)
-- [Graph Regression](docs/graph_regression.md)
-- [Community Detection](docs/community_detection.md)
-- [Anomaly Detection](docs/anomaly_detection.md)
-- [Graph Generation](docs/graph_generation.md)
-- [Graph Embedding Visualization](docs/graph_embedding_visualization.md)
-- [Dynamic Graph Learning](docs/dynamic_graph_learning.md)
 
 ## 🤝 Contributing
 
