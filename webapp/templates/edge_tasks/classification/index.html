@@ -1,0 +1,87 @@
+{% extends "base.html" %}
+
+{% block title %}Edge Classification - GNN Platform{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-random"></i>
+                        Edge Classification
+                    </h1>
+                    <p class="text-muted mb-0">Classify edges in a graph using GNNs</p>
+                </div>
+                <div>
+                    <a href="/" class="btn btn-outline-secondary">
+                        <i class="fas fa-home"></i> Back to Dashboard
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Purpose Description -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-info-circle"></i> About Edge Classification
+                    </h5>
+                    <p class="card-text">
+                        Edge classification involves predicting the type or label of edges in a graph, which is useful for tasks like relationship prediction, link type inference, and more.
+                    </p>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-lightbulb"></i> Applications:</h6>
+                            <ul>
+                                <li>Relationship prediction</li>
+                                <li>Knowledge graph completion</li>
+                                <li>Social network analysis</li>
+                                <li>Fraud detection</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6><i class="fas fa-cogs"></i> Key Features:</h6>
+                            <ul>
+                                <li>Edge-level prediction</li>
+                                <li>Utilizes edge and node features</li>
+                                <li>Supports various GNN architectures</li>
+                                <li>Handles large-scale graphs</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Available Models -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h4><i class="fas fa-brain"></i> Available Models</h4>
+        </div>
+    </div>
+    <div class="row">
+        {% for model_id, model in models.items() %}
+        <div class="col-lg-4 col-md-6 mb-4">
+            <div class="card h-100 model-card">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        <i class="fas fa-network-wired"></i> {{ model.name }}
+                    </h5>
+                    <p class="card-text">{{ model.description }}</p>
+                    <a href="/purpose/{{ purpose_name }}/experiment/{{ model_id }}" class="btn btn-success">
+                        <i class="fas fa-flask"></i> Start Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endblock %} 
