@@ -10,7 +10,7 @@ import importlib
 def safe_import_parameters(module_name: str):
     """Safely import parameters and defaults from a module."""
     try:
-        module = importlib.import_module(f'.{module_name}', package='config.parameters')
+        module = importlib.import_module(f'.{module_name}', package='webapp.config.parameters')
         parameters = getattr(module, f'{module_name.upper()}_PARAMETERS', {})
         
         # Try to get DEFAULT_PARAMETERS, fallback to task-specific default

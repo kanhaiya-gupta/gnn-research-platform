@@ -15,7 +15,7 @@ GNN_MODELS = {
         'category': 'convolutional',
         'architecture': 'spectral',
         'inductive': False,
-        'supported_tasks': ['node_classification', 'link_prediction', 'graph_classification', 'graph_regression'],
+        'supported_tasks': ['node_classification', 'node_regression', 'link_prediction', 'edge_classification', 'graph_classification', 'graph_regression', 'community_detection'],
         
         # Model-specific parameters
         'parameters': {
@@ -44,7 +44,7 @@ GNN_MODELS = {
         'category': 'attention',
         'architecture': 'attention',
         'inductive': False,
-        'supported_tasks': ['node_classification', 'link_prediction', 'graph_classification', 'graph_regression'],
+        'supported_tasks': ['node_classification', 'node_regression', 'link_prediction', 'edge_classification', 'graph_classification', 'graph_regression', 'community_detection'],
         
         # Model-specific parameters
         'parameters': {
@@ -74,7 +74,7 @@ GNN_MODELS = {
         'category': 'inductive',
         'architecture': 'spatial',
         'inductive': True,
-        'supported_tasks': ['node_classification', 'link_prediction', 'graph_classification', 'graph_regression'],
+        'supported_tasks': ['node_classification', 'node_regression', 'link_prediction', 'edge_classification', 'graph_classification', 'graph_regression', 'community_detection'],
         
         # Model-specific parameters
         'parameters': {
@@ -103,7 +103,7 @@ GNN_MODELS = {
         'category': 'convolutional',
         'architecture': 'spatial',
         'inductive': True,
-        'supported_tasks': ['node_classification', 'graph_classification', 'graph_regression'],
+        'supported_tasks': ['node_classification', 'node_regression', 'graph_classification', 'graph_regression', 'community_detection'],
         
         # Model-specific parameters
         'parameters': {
@@ -132,7 +132,7 @@ GNN_MODELS = {
         'category': 'convolutional',
         'architecture': 'spectral',
         'inductive': False,
-        'supported_tasks': ['node_classification', 'link_prediction', 'graph_classification'],
+        'supported_tasks': ['node_classification', 'node_regression', 'link_prediction', 'edge_classification', 'graph_classification', 'community_detection'],
         
         # Model-specific parameters
         'parameters': {
@@ -160,7 +160,7 @@ GNN_MODELS = {
         'category': 'generative',
         'architecture': 'autoencoder',
         'inductive': False,
-        'supported_tasks': ['link_prediction', 'graph_generation'],
+        'supported_tasks': ['link_prediction', 'edge_classification', 'graph_generation'],
         
         # Model-specific parameters
         'parameters': {
@@ -189,7 +189,7 @@ GNN_MODELS = {
         'category': 'link_prediction',
         'architecture': 'subgraph',
         'inductive': True,
-        'supported_tasks': ['link_prediction'],
+        'supported_tasks': ['link_prediction', 'edge_classification'],
         
         # Model-specific parameters
         'parameters': {
@@ -218,7 +218,7 @@ GNN_MODELS = {
         'category': 'convolutional',
         'architecture': 'spectral',
         'inductive': False,
-        'supported_tasks': ['node_classification', 'graph_classification'],
+        'supported_tasks': ['node_classification', 'node_regression', 'graph_classification', 'community_detection'],
         
         # Model-specific parameters
         'parameters': {
@@ -246,7 +246,7 @@ GNN_MODELS = {
         'category': 'propagation',
         'architecture': 'message_passing',
         'inductive': False,
-        'supported_tasks': ['node_classification'],
+        'supported_tasks': ['node_classification', 'node_regression', 'community_detection'],
         
         # Model-specific parameters
         'parameters': {
@@ -264,6 +264,695 @@ GNN_MODELS = {
             'framework': 'pytorch_geometric',
             'class': 'APPNP',
             'optimization': 'propagation',
+            'memory_efficient': True
+        }
+    },
+    
+    'diffpool': {
+        'name': 'DiffPool',
+        'description': 'Differentiable graph pooling with hierarchical clustering',
+        'paper': 'Ying et al., NeurIPS 2018',
+        'category': 'pooling',
+        'architecture': 'hierarchical',
+        'inductive': False,
+        'supported_tasks': ['graph_classification', 'graph_regression'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'pooling_ratio': {'default': 0.5, 'range': [0.1, 0.9]},
+            'link_pred': {'default': True, 'type': 'bool'},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'pytorch_geometric',
+            'class': 'DiffPool',
+            'optimization': 'hierarchical',
+            'memory_efficient': False
+        }
+    },
+    
+    'sortpool': {
+        'name': 'SortPool',
+        'description': 'SortPooling for graph neural networks',
+        'paper': 'Zhang et al., AAAI 2018',
+        'category': 'pooling',
+        'architecture': 'sorting',
+        'inductive': False,
+        'supported_tasks': ['graph_classification', 'graph_regression'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'k': {'default': 30, 'range': [10, 100]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'pytorch_geometric',
+            'class': 'SortPool',
+            'optimization': 'sorting',
+            'memory_efficient': True
+        }
+    },
+    
+    'gcn_ae': {
+        'name': 'GCN Autoencoder',
+        'description': 'Graph Convolutional Network with Autoencoder for anomaly detection',
+        'paper': 'Various papers on GCN autoencoders',
+        'category': 'anomaly_detection',
+        'architecture': 'autoencoder',
+        'inductive': False,
+        'supported_tasks': ['anomaly_detection'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'latent_dim': {'default': 32, 'range': [8, 256]},
+            'anomaly_threshold': {'default': 0.5, 'range': [0.1, 0.9]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'pytorch_geometric',
+            'class': 'GCNAutoencoder',
+            'optimization': 'reconstruction',
+            'memory_efficient': True
+        }
+    },
+    
+    'gat_ae': {
+        'name': 'GAT Autoencoder',
+        'description': 'Graph Attention Network with Autoencoder for anomaly detection',
+        'paper': 'Various papers on GAT autoencoders',
+        'category': 'anomaly_detection',
+        'architecture': 'attention_autoencoder',
+        'inductive': False,
+        'supported_tasks': ['anomaly_detection'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'attention_heads': {'default': 8, 'range': [1, 16]},
+            'latent_dim': {'default': 32, 'range': [8, 256]},
+            'anomaly_threshold': {'default': 0.5, 'range': [0.1, 0.9]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'pytorch_geometric',
+            'class': 'GATAutoencoder',
+            'optimization': 'attention_reconstruction',
+            'memory_efficient': False
+        }
+    },
+    
+    'dominant': {
+        'name': 'DOMINANT',
+        'description': 'Deep Anomaly Detection on Attributed Networks',
+        'paper': 'Ding et al., WSDM 2019',
+        'category': 'anomaly_detection',
+        'architecture': 'reconstruction',
+        'inductive': False,
+        'supported_tasks': ['anomaly_detection'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'alpha': {'default': 0.5, 'range': [0.1, 0.9]},
+            'beta': {'default': 0.5, 'range': [0.1, 0.9]},
+            'anomaly_threshold': {'default': 0.5, 'range': [0.1, 0.9]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'DOMINANT',
+            'optimization': 'reconstruction',
+            'memory_efficient': True
+        }
+    },
+    
+    'anomalydae': {
+        'name': 'AnomalyDAE',
+        'description': 'Anomaly Detection on Attributed Networks via Variational Graph Autoencoder',
+        'paper': 'Fan et al., KDD 2020',
+        'category': 'anomaly_detection',
+        'architecture': 'variational_autoencoder',
+        'inductive': False,
+        'supported_tasks': ['anomaly_detection'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'latent_dim': {'default': 32, 'range': [8, 256]},
+            'beta': {'default': 1.0, 'range': [0.0, 10.0]},
+            'anomaly_threshold': {'default': 0.5, 'range': [0.1, 0.9]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'AnomalyDAE',
+            'optimization': 'variational',
+            'memory_efficient': True
+        }
+    },
+    
+    'ganomaly': {
+        'name': 'GAnomaly',
+        'description': 'Generative Adversarial Network for Anomaly Detection',
+        'paper': 'Various papers on GAN-based anomaly detection',
+        'category': 'anomaly_detection',
+        'architecture': 'generative_adversarial',
+        'inductive': False,
+        'supported_tasks': ['anomaly_detection'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'latent_dim': {'default': 32, 'range': [8, 256]},
+            'noise_dim': {'default': 16, 'range': [4, 128]},
+            'anomaly_threshold': {'default': 0.5, 'range': [0.1, 0.9]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'GAnomaly',
+            'optimization': 'adversarial',
+            'memory_efficient': False
+        }
+    },
+    
+    'graphsage_ae': {
+        'name': 'GraphSAGE Autoencoder',
+        'description': 'GraphSAGE with Autoencoder for anomaly detection',
+        'paper': 'Various papers on GraphSAGE autoencoders',
+        'category': 'anomaly_detection',
+        'architecture': 'inductive_autoencoder',
+        'inductive': True,
+        'supported_tasks': ['anomaly_detection'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'neighbor_sampling': {'default': 25, 'range': [5, 100]},
+            'latent_dim': {'default': 32, 'range': [8, 256]},
+            'anomaly_threshold': {'default': 0.5, 'range': [0.1, 0.9]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'pytorch_geometric',
+            'class': 'GraphSAGEAutoencoder',
+            'optimization': 'sampling_reconstruction',
+            'memory_efficient': True
+        }
+    },
+    
+    'dysat': {
+        'name': 'DySAT',
+        'description': 'Dynamic Self-Attention Network for Dynamic Graph Embedding',
+        'paper': 'Sankar et al., WSDM 2020',
+        'category': 'dynamic_graph',
+        'architecture': 'temporal_attention',
+        'inductive': False,
+        'supported_tasks': ['dynamic_graph_learning'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'attention_heads': {'default': 8, 'range': [1, 16]},
+            'num_time_steps': {'default': 10, 'range': [5, 50]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'DySAT',
+            'optimization': 'temporal_attention',
+            'memory_efficient': False
+        }
+    },
+    
+    'tgat': {
+        'name': 'Temporal Graph Attention Network',
+        'description': 'Temporal Graph Attention Network for Dynamic Graph Learning',
+        'paper': 'Xu et al., ICLR 2020',
+        'category': 'dynamic_graph',
+        'architecture': 'temporal_attention',
+        'inductive': False,
+        'supported_tasks': ['dynamic_graph_learning'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'attention_heads': {'default': 8, 'range': [1, 16]},
+            'num_time_steps': {'default': 10, 'range': [5, 50]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'TGAT',
+            'optimization': 'temporal_attention',
+            'memory_efficient': False
+        }
+    },
+    
+    'evolvegcn': {
+        'name': 'EvolveGCN',
+        'description': 'Evolving Graph Convolutional Networks for Dynamic Graph Learning',
+        'paper': 'Pareja et al., NeurIPS 2020',
+        'category': 'dynamic_graph',
+        'architecture': 'evolving_convolution',
+        'inductive': False,
+        'supported_tasks': ['dynamic_graph_learning'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'evolve_type': {'default': 'GRU', 'options': ['GRU', 'HGRU']},
+            'num_time_steps': {'default': 10, 'range': [5, 50]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'EvolveGCN',
+            'optimization': 'evolving',
+            'memory_efficient': True
+        }
+    },
+    
+    'dyrep': {
+        'name': 'DyRep',
+        'description': 'Learning Representations over Dynamic Graphs',
+        'paper': 'Trivedi et al., ICLR 2019',
+        'category': 'dynamic_graph',
+        'architecture': 'temporal_point_process',
+        'inductive': False,
+        'supported_tasks': ['dynamic_graph_learning'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'num_time_steps': {'default': 10, 'range': [5, 50]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'DyRep',
+            'optimization': 'temporal_point_process',
+            'memory_efficient': True
+        }
+    },
+    
+    'jodie': {
+        'name': 'JODIE',
+        'description': 'Predicting Dynamic Embedding Trajectory in Temporal Interaction Networks',
+        'paper': 'Kumar et al., KDD 2019',
+        'category': 'dynamic_graph',
+        'architecture': 'temporal_interaction',
+        'inductive': False,
+        'supported_tasks': ['dynamic_graph_learning'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'num_time_steps': {'default': 10, 'range': [5, 50]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'JODIE',
+            'optimization': 'temporal_interaction',
+            'memory_efficient': True
+        }
+    },
+    
+    'tgn': {
+        'name': 'Temporal Graph Network',
+        'description': 'Temporal Graph Networks for Deep Learning on Dynamic Graphs',
+        'paper': 'Rossi et al., NeurIPS 2020',
+        'category': 'dynamic_graph',
+        'architecture': 'temporal_network',
+        'inductive': False,
+        'supported_tasks': ['dynamic_graph_learning'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'num_time_steps': {'default': 10, 'range': [5, 50]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'TGN',
+            'optimization': 'temporal_network',
+            'memory_efficient': True
+        }
+    },
+    
+    'graphrnn': {
+        'name': 'GraphRNN',
+        'description': 'Generating Realistic Graphs with Recurrent Neural Networks',
+        'paper': 'You et al., ICML 2018',
+        'category': 'graph_generation',
+        'architecture': 'recurrent',
+        'inductive': False,
+        'supported_tasks': ['graph_generation'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'max_nodes': {'default': 20, 'range': [5, 100]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'GraphRNN',
+            'optimization': 'recurrent',
+            'memory_efficient': True
+        }
+    },
+    
+    'graphvae': {
+        'name': 'GraphVAE',
+        'description': 'Variational Autoencoder for Graph Generation',
+        'paper': 'Simonovsky & Komodakis, NeurIPS 2018',
+        'category': 'graph_generation',
+        'architecture': 'variational_autoencoder',
+        'inductive': False,
+        'supported_tasks': ['graph_generation'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'latent_dim': {'default': 32, 'range': [8, 256]},
+            'max_nodes': {'default': 20, 'range': [5, 100]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'GraphVAE',
+            'optimization': 'variational',
+            'memory_efficient': True
+        }
+    },
+    
+    'graphgan': {
+        'name': 'GraphGAN',
+        'description': 'Generative Adversarial Network for Graph Generation',
+        'paper': 'Wang et al., AAAI 2018',
+        'category': 'graph_generation',
+        'architecture': 'generative_adversarial',
+        'inductive': False,
+        'supported_tasks': ['graph_generation'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'noise_dim': {'default': 16, 'range': [4, 128]},
+            'max_nodes': {'default': 20, 'range': [5, 100]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'GraphGAN',
+            'optimization': 'adversarial',
+            'memory_efficient': False
+        }
+    },
+    
+    'molgan': {
+        'name': 'MolGAN',
+        'description': 'An implicit generative model for small molecular graphs',
+        'paper': 'De Cao & Kipf, ICML 2018',
+        'category': 'graph_generation',
+        'architecture': 'generative_adversarial',
+        'inductive': False,
+        'supported_tasks': ['graph_generation'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'noise_dim': {'default': 16, 'range': [4, 128]},
+            'max_nodes': {'default': 20, 'range': [5, 100]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'MolGAN',
+            'optimization': 'adversarial',
+            'memory_efficient': False
+        }
+    },
+    
+    'graphaf': {
+        'name': 'GraphAF',
+        'description': 'Flow-based Autoregressive Model for Graph Generation',
+        'paper': 'Shi et al., ICML 2020',
+        'category': 'graph_generation',
+        'architecture': 'flow_autoregressive',
+        'inductive': False,
+        'supported_tasks': ['graph_generation'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'max_nodes': {'default': 20, 'range': [5, 100]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'GraphAF',
+            'optimization': 'flow',
+            'memory_efficient': True
+        }
+    },
+    
+    'graphscore': {
+        'name': 'GraphScore',
+        'description': 'Score-based Model for Graph Generation',
+        'paper': 'Various papers on score-based graph generation',
+        'category': 'graph_generation',
+        'architecture': 'score_based',
+        'inductive': False,
+        'supported_tasks': ['graph_generation'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'hidden_dim': {'default': 64, 'range': [16, 512]},
+            'num_layers': {'default': 3, 'range': [1, 10]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'max_nodes': {'default': 20, 'range': [5, 100]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'GraphScore',
+            'optimization': 'score_based',
+            'memory_efficient': True
+        }
+    },
+    
+    'node2vec': {
+        'name': 'Node2Vec',
+        'description': 'Scalable Feature Learning for Networks',
+        'paper': 'Grover & Leskovec, KDD 2016',
+        'category': 'embedding',
+        'architecture': 'random_walk',
+        'inductive': False,
+        'supported_tasks': ['graph_embedding_visualization'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'embedding_dim': {'default': 128, 'range': [16, 512]},
+            'walk_length': {'default': 80, 'range': [10, 200]},
+            'num_walks': {'default': 10, 'range': [1, 50]},
+            'p': {'default': 1.0, 'range': [0.1, 10.0]},
+            'q': {'default': 1.0, 'range': [0.1, 10.0]},
+            'window_size': {'default': 10, 'range': [1, 20]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'networkx',
+            'class': 'Node2Vec',
+            'optimization': 'random_walk',
+            'memory_efficient': True
+        }
+    },
+    
+    'deepwalk': {
+        'name': 'DeepWalk',
+        'description': 'Online Learning of Social Representations',
+        'paper': 'Perozzi et al., KDD 2014',
+        'category': 'embedding',
+        'architecture': 'random_walk',
+        'inductive': False,
+        'supported_tasks': ['graph_embedding_visualization'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'embedding_dim': {'default': 128, 'range': [16, 512]},
+            'walk_length': {'default': 80, 'range': [10, 200]},
+            'num_walks': {'default': 10, 'range': [1, 50]},
+            'window_size': {'default': 10, 'range': [1, 20]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'networkx',
+            'class': 'DeepWalk',
+            'optimization': 'random_walk',
+            'memory_efficient': True
+        }
+    },
+    
+    'line': {
+        'name': 'LINE',
+        'description': 'Large-scale Information Network Embedding',
+        'paper': 'Tang et al., WWW 2015',
+        'category': 'embedding',
+        'architecture': 'edge_sampling',
+        'inductive': False,
+        'supported_tasks': ['graph_embedding_visualization'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'embedding_dim': {'default': 128, 'range': [16, 512]},
+            'order': {'default': 2, 'range': [1, 3]},
+            'negative': {'default': 5, 'range': [1, 20]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'networkx',
+            'class': 'LINE',
+            'optimization': 'edge_sampling',
+            'memory_efficient': True
+        }
+    },
+    
+    'sdne': {
+        'name': 'SDNE',
+        'description': 'Structural Deep Network Embedding',
+        'paper': 'Wang et al., KDD 2016',
+        'category': 'embedding',
+        'architecture': 'autoencoder',
+        'inductive': False,
+        'supported_tasks': ['graph_embedding_visualization'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'embedding_dim': {'default': 128, 'range': [16, 512]},
+            'hidden_dim': {'default': 256, 'range': [64, 1024]},
+            'dropout': {'default': 0.1, 'range': [0.0, 0.5]},
+            'activation': {'default': 'relu', 'options': ['relu', 'tanh', 'sigmoid']},
+            'alpha': {'default': 1.0, 'range': [0.1, 10.0]},
+            'beta': {'default': 1.0, 'range': [0.1, 10.0]},
+            'bias': {'default': True, 'type': 'bool'}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'custom',
+            'class': 'SDNE',
+            'optimization': 'autoencoder',
             'memory_efficient': True
         }
     }
@@ -312,6 +1001,41 @@ MODEL_CATEGORIES = {
         'icon': 'fas fa-share-alt',
         'color': 'secondary',
         'models': ['appnp']
+    },
+    'pooling': {
+        'name': 'Pooling Models',
+        'description': 'Models for graph-level pooling',
+        'icon': 'fas fa-layer-group',
+        'color': 'dark',
+        'models': ['diffpool', 'sortpool']
+    },
+    'anomaly_detection': {
+        'name': 'Anomaly Detection Models',
+        'description': 'Models for detecting anomalies in graphs',
+        'icon': 'fas fa-exclamation-triangle',
+        'color': 'danger',
+        'models': ['gcn_ae', 'gat_ae', 'dominant', 'anomalydae', 'ganomaly', 'graphsage_ae']
+    },
+    'dynamic_graph': {
+        'name': 'Dynamic Graph Models',
+        'description': 'Models for learning from dynamic graphs',
+        'icon': 'fas fa-clock',
+        'color': 'info',
+        'models': ['dysat', 'tgat', 'evolvegcn', 'dyrep', 'jodie', 'tgn']
+    },
+    'graph_generation': {
+        'name': 'Graph Generation Models',
+        'description': 'Models for generating new graphs',
+        'icon': 'fas fa-project-diagram',
+        'color': 'purple',
+        'models': ['graphrnn', 'graphvae', 'graphgan', 'molgan', 'graphaf', 'graphscore']
+    },
+    'embedding': {
+        'name': 'Embedding Models',
+        'description': 'Models for learning graph embeddings',
+        'icon': 'fas fa-eye',
+        'color': 'secondary',
+        'models': ['node2vec', 'deepwalk', 'line', 'sdne']
     }
 }
 

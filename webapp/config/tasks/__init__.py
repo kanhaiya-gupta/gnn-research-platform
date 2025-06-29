@@ -6,49 +6,47 @@ This module provides a centralized registry of all available GNN tasks.
 # Import all task configurations
 from .node_classification import NODE_CLASSIFICATION_TASK, TASK_METADATA as NODE_CLASSIFICATION_METADATA
 from .link_prediction import LINK_PREDICTION_TASK, TASK_METADATA as LINK_PREDICTION_METADATA
+from .node_regression import NODE_REGRESSION_TASK, TASK_METADATA as NODE_REGRESSION_METADATA
+from .graph_regression import GRAPH_REGRESSION_TASK, TASK_METADATA as GRAPH_REGRESSION_METADATA
+from .anomaly_detection import ANOMALY_DETECTION_TASK, TASK_METADATA as ANOMALY_DETECTION_METADATA
+from .dynamic_graph_learning import DYNAMIC_GRAPH_LEARNING_TASK, TASK_METADATA as DYNAMIC_GRAPH_LEARNING_METADATA
+from .graph_generation import GRAPH_GENERATION_TASK, TASK_METADATA as GRAPH_GENERATION_METADATA
+from .graph_embedding import GRAPH_EMBEDDING_TASK, TASK_METADATA as GRAPH_EMBEDDING_METADATA
+from .edge_classification import EDGE_CLASSIFICATION_TASK, TASK_METADATA as EDGE_CLASSIFICATION_METADATA
+from .graph_classification import GRAPH_CLASSIFICATION_TASK, TASK_METADATA as GRAPH_CLASSIFICATION_METADATA
+from .community_detection import COMMUNITY_DETECTION_TASK, TASK_METADATA as COMMUNITY_DETECTION_METADATA
 
 # Import task configurations for other purposes
 # Note: These would be imported when the corresponding files are created
-# from .node_regression import NODE_REGRESSION_TASK, TASK_METADATA as NODE_REGRESSION_METADATA
-# from .edge_classification import EDGE_CLASSIFICATION_TASK, TASK_METADATA as EDGE_CLASSIFICATION_METADATA
-# from .graph_classification import GRAPH_CLASSIFICATION_TASK, TASK_METADATA as GRAPH_CLASSIFICATION_METADATA
-# from .graph_regression import GRAPH_REGRESSION_TASK, TASK_METADATA as GRAPH_REGRESSION_METADATA
-# from .community_detection import COMMUNITY_DETECTION_TASK, TASK_METADATA as COMMUNITY_DETECTION_METADATA
-# from .anomaly_detection import ANOMALY_DETECTION_TASK, TASK_METADATA as ANOMALY_DETECTION_METADATA
-# from .graph_generation import GRAPH_GENERATION_TASK, TASK_METADATA as GRAPH_GENERATION_METADATA
-# from .graph_embedding import GRAPH_EMBEDDING_TASK, TASK_METADATA as GRAPH_EMBEDDING_METADATA
-# from .dynamic_graph_learning import DYNAMIC_GRAPH_LEARNING_TASK, TASK_METADATA as DYNAMIC_GRAPH_LEARNING_METADATA
 
 # Task registry dictionary
 TASK_REGISTRY = {
     'node_classification': NODE_CLASSIFICATION_TASK,
     'link_prediction': LINK_PREDICTION_TASK,
-    # Add other tasks as they are implemented
-    # 'node_regression': NODE_REGRESSION_TASK,
-    # 'edge_classification': EDGE_CLASSIFICATION_TASK,
-    # 'graph_classification': GRAPH_CLASSIFICATION_TASK,
-    # 'graph_regression': GRAPH_REGRESSION_TASK,
-    # 'community_detection': COMMUNITY_DETECTION_TASK,
-    # 'anomaly_detection': ANOMALY_DETECTION_TASK,
-    # 'graph_generation': GRAPH_GENERATION_TASK,
-    # 'graph_embedding': GRAPH_EMBEDDING_TASK,
-    # 'dynamic_graph_learning': DYNAMIC_GRAPH_LEARNING_TASK,
+    'node_regression': NODE_REGRESSION_TASK,
+    'graph_regression': GRAPH_REGRESSION_TASK,
+    'anomaly_detection': ANOMALY_DETECTION_TASK,
+    'dynamic_graph_learning': DYNAMIC_GRAPH_LEARNING_TASK,
+    'graph_generation': GRAPH_GENERATION_TASK,
+    'graph_embedding': GRAPH_EMBEDDING_TASK,
+    'edge_classification': EDGE_CLASSIFICATION_TASK,
+    'graph_classification': GRAPH_CLASSIFICATION_TASK,
+    'community_detection': COMMUNITY_DETECTION_TASK,
 }
 
 # Metadata registry
 TASK_METADATA_REGISTRY = {
     'node_classification': NODE_CLASSIFICATION_METADATA,
     'link_prediction': LINK_PREDICTION_METADATA,
-    # Add other task metadata as they are implemented
-    # 'node_regression': NODE_REGRESSION_METADATA,
-    # 'edge_classification': EDGE_CLASSIFICATION_METADATA,
-    # 'graph_classification': GRAPH_CLASSIFICATION_METADATA,
-    # 'graph_regression': GRAPH_REGRESSION_METADATA,
-    # 'community_detection': COMMUNITY_DETECTION_METADATA,
-    # 'anomaly_detection': ANOMALY_DETECTION_METADATA,
-    # 'graph_generation': GRAPH_GENERATION_METADATA,
-    # 'graph_embedding': GRAPH_EMBEDDING_METADATA,
-    # 'dynamic_graph_learning': DYNAMIC_GRAPH_LEARNING_METADATA,
+    'node_regression': NODE_REGRESSION_METADATA,
+    'graph_regression': GRAPH_REGRESSION_METADATA,
+    'anomaly_detection': ANOMALY_DETECTION_METADATA,
+    'dynamic_graph_learning': DYNAMIC_GRAPH_LEARNING_METADATA,
+    'graph_generation': GRAPH_GENERATION_METADATA,
+    'graph_embedding': GRAPH_EMBEDDING_METADATA,
+    'edge_classification': EDGE_CLASSIFICATION_METADATA,
+    'graph_classification': GRAPH_CLASSIFICATION_METADATA,
+    'community_detection': COMMUNITY_DETECTION_METADATA,
 }
 
 # Task categories for organization

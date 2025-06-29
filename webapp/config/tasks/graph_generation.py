@@ -21,7 +21,7 @@ GRAPH_GENERATION_TASK = {
     
     # Task-specific configuration
     'supported_models': [
-        'vae', 'gan', 'flow', 'diffusion', 'autoregressive', 'graphvae', 'graphgan'
+        'graphrnn', 'graphvae', 'graphgan', 'molgan', 'graphaf', 'graphscore'
     ],
     'supported_datasets': [
         'zinc', 'qm9', 'qm7', 'mutag', 'ptc_mr', 'enzymes',

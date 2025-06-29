@@ -651,11 +651,46 @@ class Config:
     
     def get_models_by_purpose(self, purpose_name: str) -> Dict[str, Any]:
         """Get models for a specific purpose."""
-        return self.MODELS_BY_PURPOSE.get(purpose_name, {})
+        # Import here to avoid circular imports
+        from .tasks import get_task_config
+        from .models import get_model_config
+        
+        # Get the task configuration
+        task_config = get_task_config(purpose_name)
+        if not task_config:
+            return {}
+        
+        # Get supported models from task config
+        supported_models = task_config.get('supported_models', [])
+        
+        # Build models dictionary from supported models
+        models = {}
+        for model_id in supported_models:
+            model_config = get_model_config(model_id)
+            if model_config:
+                models[model_id] = {
+                    'name': model_config['name'],
+                    'description': model_config['description'],
+                    'category': model_config['category'],
+                    'paper': model_config['paper'],
+                    'architecture': model_config['architecture'],
+                    'inductive': model_config['inductive']
+                }
+        
+        return models
     
     def get_parameters_by_purpose(self, purpose_name: str) -> Dict[str, Any]:
         """Get parameters for a specific purpose."""
-        return self.PARAMETERS_BY_PURPOSE.get(purpose_name, {})
+        # Import here to avoid circular imports
+        from .tasks import get_task_config
+        
+        # Get the task configuration
+        task_config = get_task_config(purpose_name)
+        if not task_config:
+            return {}
+        
+        # Return parameters from task config
+        return task_config.get('parameters', {})
     
     def get_model_specific_parameters(self, purpose_name: str, model_id: str) -> Dict[str, Any]:
         """Get model-specific parameters for a purpose and model."""

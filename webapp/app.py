@@ -82,6 +82,21 @@ PURPOSE_TEMPLATE_MAPPING = {
     'graph_embedding_visualization': 'graph_embedding_visualization'
 }
 
+# Mapping between URL purpose names and task configuration names
+PURPOSE_TASK_MAPPING = {
+    'node_classification': 'node_classification',
+    'node_regression': 'node_regression',
+    'edge_classification': 'edge_classification',
+    'link_prediction': 'link_prediction',
+    'graph_classification': 'graph_classification',
+    'graph_regression': 'graph_regression',
+    'community_detection': 'community_detection',
+    'anomaly_detection': 'anomaly_detection',
+    'dynamic_graph_learning': 'dynamic_graph_learning',
+    'graph_generation': 'graph_generation',
+    'graph_embedding_visualization': 'graph_embedding'
+}
+
 @app.get("/", response_class=HTMLResponse)
 async def dashboard(request: Request):
     """Main dashboard page"""
@@ -108,8 +123,11 @@ async def purpose_page(request: Request, purpose_name: str):
     if not template_path:
         raise HTTPException(status_code=404, detail="Template mapping not found")
     
-    models = config.get_models_by_purpose(purpose_name)
-    parameters = config.get_parameters_by_purpose(purpose_name)
+    # Get the correct task name for configuration
+    task_name = PURPOSE_TASK_MAPPING.get(purpose_name, purpose_name)
+    
+    models = config.get_models_by_purpose(task_name)
+    parameters = config.get_parameters_by_purpose(task_name)
     
     return templates.TemplateResponse(
         f"{template_path}/index.html",
@@ -137,14 +155,17 @@ async def purpose_experiment_page(request: Request, purpose_name: str, model_id:
     if not template_path:
         raise HTTPException(status_code=404, detail="Template mapping not found")
     
-    models = config.get_models_by_purpose(purpose_name)
+    # Get the correct task name for configuration
+    task_name = PURPOSE_TASK_MAPPING.get(purpose_name, purpose_name)
+    
+    models = config.get_models_by_purpose(task_name)
     if model_id not in models:
         raise HTTPException(status_code=404, detail="Model not found")
     
     model_info = models[model_id]
     
     # Get model-specific parameters
-    model_specific_params = config.get_model_specific_parameters(purpose_name, model_id)
+    model_specific_params = config.get_model_specific_parameters(task_name, model_id)
     
     # Create default parameters for the template
     default_params = {
@@ -188,7 +209,10 @@ async def purpose_results_page(request: Request, purpose_name: str, model_id: st
     if not template_path:
         raise HTTPException(status_code=404, detail="Template mapping not found")
     
-    models = config.get_models_by_purpose(purpose_name)
+    # Get the correct task name for configuration
+    task_name = PURPOSE_TASK_MAPPING.get(purpose_name, purpose_name)
+    
+    models = config.get_models_by_purpose(task_name)
     if model_id not in models:
         raise HTTPException(status_code=404, detail="Model not found")
     

@@ -17,6 +17,365 @@
     <!-- Chart.js -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    
+    <!-- Additional CSS for this template -->
+    <style>
+        :root {
+            --primary-color: #2563eb;
+            --primary-dark: #1d4ed8;
+            --primary-light: #3b82f6;
+            --secondary-color: #64748b;
+            --accent-color: #8b5cf6;
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --background-light: #f8fafc;
+            --background-white: #ffffff;
+            --border-color: #e2e8f0;
+            --shadow-light: 0 1px 3px rgba(0,0,0,0.1);
+            --shadow-medium: 0 4px 6px rgba(0,0,0,0.1);
+            --shadow-heavy: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            color: var(--text-primary);
+            background-color: var(--background-light);
+            margin: 0;
+            padding: 0;
+        }
+
+        /* Modern Navbar */
+        .navbar {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            box-shadow: var(--shadow-medium);
+            padding: 0.75rem 0;
+            border-bottom: none;
+        }
+
+        .navbar-brand {
+            font-weight: 700;
+            font-size: 1.5rem;
+            color: white !important;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-brand i {
+            font-size: 1.8rem;
+            color: #bfdbfe;
+        }
+
+        .navbar-nav .nav-link {
+            color: rgba(255, 255, 255, 0.9) !important;
+            font-weight: 500;
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            margin: 0 0.25rem;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .navbar-nav .nav-link:hover {
+            color: white !important;
+            background-color: rgba(255, 255, 255, 0.1);
+            transform: translateY(-1px);
+        }
+
+        .navbar-nav .nav-link.active {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white !important;
+        }
+
+        .navbar-toggler {
+            border: none;
+            padding: 0.5rem;
+        }
+
+        .navbar-toggler:focus {
+            box-shadow: none;
+        }
+
+        /* Dropdown Styling */
+        .dropdown-menu {
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--shadow-heavy);
+            padding: 0.5rem;
+            margin-top: 0.5rem;
+        }
+
+        .dropdown-item {
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-item:hover {
+            background-color: var(--background-light);
+            transform: translateX(4px);
+        }
+
+        /* Main Content */
+        .main-content {
+            min-height: calc(100vh - 80px);
+            padding: 2rem 0;
+        }
+
+        .container-fluid {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 1.5rem;
+        }
+
+        /* Cards and Components */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: var(--shadow-light);
+            transition: all 0.3s ease;
+            background: var(--background-white);
+        }
+
+        .card:hover {
+            box-shadow: var(--shadow-medium);
+            transform: translateY(-2px);
+        }
+
+        .card-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 12px 12px 0 0 !important;
+            border: none;
+            padding: 1.25rem 1.5rem;
+        }
+
+        /* Buttons */
+        .btn {
+            border-radius: 8px;
+            font-weight: 500;
+            padding: 0.75rem 1.5rem;
+            transition: all 0.3s ease;
+            border: none;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-dark) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-color) 100%);
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-medium);
+        }
+
+        .btn-outline-primary {
+            border: 2px solid var(--primary-color);
+            color: var(--primary-color);
+            background: transparent;
+        }
+
+        .btn-outline-primary:hover {
+            background: var(--primary-color);
+            color: white;
+            transform: translateY(-1px);
+        }
+
+        .btn-secondary {
+            background: var(--text-secondary);
+            color: white;
+        }
+
+        .btn-outline-secondary {
+            border: 2px solid var(--text-secondary);
+            color: var(--text-secondary);
+            background: transparent;
+        }
+
+        .btn-outline-secondary:hover {
+            background: var(--text-secondary);
+            color: white;
+        }
+
+        /* Forms */
+        .form-control, .form-select {
+            border-radius: 8px;
+            border: 2px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.25);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 1rem;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+        }
+
+        h2 {
+            font-size: 2rem;
+        }
+
+        h3 {
+            font-size: 1.5rem;
+        }
+
+        /* Code blocks */
+        code, pre {
+            font-family: 'JetBrains Mono', 'Fira Code', monospace;
+            background-color: #f8f9fa;
+            border-radius: 6px;
+            padding: 0.25rem 0.5rem;
+        }
+
+        pre {
+            padding: 1rem;
+            border: 1px solid var(--border-color);
+        }
+
+        /* Alerts */
+        .alert {
+            border-radius: 8px;
+            border: none;
+            padding: 1rem 1.5rem;
+        }
+
+        .alert-info {
+            background: linear-gradient(135deg, #dbeafe 0%, #bfdbfe 100%);
+            color: var(--primary-dark);
+        }
+
+        .alert-success {
+            background: linear-gradient(135deg, #d1fae5 0%, #a7f3d0 100%);
+            color: #065f46;
+        }
+
+        .alert-warning {
+            background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+            color: #92400e;
+        }
+
+        .alert-danger {
+            background: linear-gradient(135deg, #fee2e2 0%, #fecaca 100%);
+            color: #991b1b;
+        }
+
+        /* Tables */
+        .table {
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: var(--shadow-light);
+        }
+
+        .table thead th {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border: none;
+            font-weight: 600;
+            padding: 1rem;
+        }
+
+        .table tbody td {
+            padding: 1rem;
+            border-color: var(--border-color);
+        }
+
+        /* Modal */
+        .modal-content {
+            border-radius: 12px;
+            border: none;
+            box-shadow: var(--shadow-heavy);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--primary-color) 0%, var(--secondary-color) 100%);
+            color: white;
+            border-radius: 12px 12px 0 0;
+            border: none;
+        }
+
+        .modal-title {
+            font-weight: 600;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .navbar-nav {
+                margin-top: 1rem;
+            }
+            
+            .navbar-nav .nav-link {
+                margin: 0.25rem 0;
+            }
+            
+            .dropdown-menu {
+                border: none;
+                box-shadow: none;
+                background: rgba(255, 255, 255, 0.1);
+            }
+            
+            .dropdown-item {
+                color: white;
+            }
+            
+            .dropdown-item:hover {
+                background: rgba(255, 255, 255, 0.2);
+                color: white;
+            }
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--text-primary) 0%, var(--secondary-color) 100%);
+            color: white;
+            padding: 2rem 0;
+            margin-top: 3rem;
+        }
+
+        .footer h5 {
+            color: white;
+            margin-bottom: 1rem;
+        }
+
+        .footer p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+    </style>
+    
     {% block extra_head %}{% endblock %}
 </head>
 <body>
@@ -25,7 +384,7 @@
         <div class="container">
             <a class="navbar-brand" href="/">
                 <i class="fas fa-project-diagram"></i>
-                GNN Platform
+                GNN Research Platform
             </a>
             
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
@@ -40,40 +399,65 @@
                         </a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="nodeDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-circle"></i> Node Tasks
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-flask"></i> Applications
                         </a>
                         <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/purpose/node_tasks.classification">Classification</a></li>
-                            <li><a class="dropdown-item" href="/purpose/node_tasks.regression">Regression</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="edgeDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-link"></i> Edge Tasks
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/purpose/edge_tasks.classification">Classification</a></li>
-                            <li><a class="dropdown-item" href="/purpose/edge_tasks.link_prediction">Link Prediction</a></li>
-                        </ul>
-                    </li>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="graphDropdown" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-project-diagram"></i> Graph Tasks
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="/purpose/graph_tasks.classification">Classification</a></li>
-                            <li><a class="dropdown-item" href="/purpose/graph_tasks.regression">Regression</a></li>
+                            <!-- Node Tasks -->
+                            <li><h6 class="dropdown-header">Node Tasks</h6></li>
+                            <li><a class="dropdown-item" href="/purpose/node_classification">
+                                <i class="fas fa-circle"></i> Node Classification
+                            </a></li>
+                            <li><a class="dropdown-item" href="/purpose/node_regression">
+                                <i class="fas fa-chart-line"></i> Node Regression
+                            </a></li>
+                            
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <!-- Edge Tasks -->
+                            <li><h6 class="dropdown-header">Edge Tasks</h6></li>
+                            <li><a class="dropdown-item" href="/purpose/edge_classification">
+                                <i class="fas fa-random"></i> Edge Classification
+                            </a></li>
+                            <li><a class="dropdown-item" href="/purpose/link_prediction">
+                                <i class="fas fa-link"></i> Link Prediction
+                            </a></li>
+                            
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <!-- Graph Tasks -->
+                            <li><h6 class="dropdown-header">Graph Tasks</h6></li>
+                            <li><a class="dropdown-item" href="/purpose/graph_classification">
+                                <i class="fas fa-shapes"></i> Graph Classification
+                            </a></li>
+                            <li><a class="dropdown-item" href="/purpose/graph_regression">
+                                <i class="fas fa-chart-area"></i> Graph Regression
+                            </a></li>
+                            
+                            <li><hr class="dropdown-divider"></li>
+                            
+                            <!-- Specialized Applications -->
+                            <li><h6 class="dropdown-header">Specialized Applications</h6></li>
+                            <li><a class="dropdown-item" href="/purpose/community_detection">
+                                <i class="fas fa-users"></i> Community Detection
+                            </a></li>
+                            <li><a class="dropdown-item" href="/purpose/anomaly_detection">
+                                <i class="fas fa-exclamation-triangle"></i> Anomaly Detection
+                            </a></li>
+                            <li><a class="dropdown-item" href="/purpose/graph_generation">
+                                <i class="fas fa-magic"></i> Graph Generation
+                            </a></li>
+                            <li><a class="dropdown-item" href="/purpose/graph_embedding_visualization">
+                                <i class="fas fa-eye"></i> Graph Embedding
+                            </a></li>
+                            <li><a class="dropdown-item" href="/purpose/dynamic_graph_learning">
+                                <i class="fas fa-clock"></i> Dynamic Graph Learning
+                            </a></li>
                         </ul>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/purpose/community_detection">
-                            <i class="fas fa-users"></i> Community Detection
-                        </a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/purpose/anomaly_detection">
-                            <i class="fas fa-exclamation-triangle"></i> Anomaly Detection
+                        <a class="nav-link" href="http://localhost:8000/docs" target="_blank">
+                            <i class="fas fa-code"></i> API Docs
                         </a>
                     </li>
                 </ul>
@@ -82,6 +466,11 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#helpModal">
                             <i class="fas fa-question-circle"></i> Help
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#aboutModal">
+                            <i class="fas fa-info-circle"></i> About
                         </a>
                     </li>
                 </ul>
@@ -120,9 +509,12 @@
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
                 <div class="modal-body">
-                    <h6>Getting Started</h6>
+                    <h6><i class="fas fa-brain"></i> What are Graph Neural Networks?</h6>
+                    <p>GNNs are neural networks designed to work with graph-structured data, enabling powerful applications in social networks, bioinformatics, recommendation systems, and more.</p>
+                    
+                    <h6><i class="fas fa-route"></i> How to use this platform:</h6>
                     <ol>
-                        <li>Choose a GNN application from the dashboard</li>
+                        <li>Choose a GNN application from the Applications menu</li>
                         <li>Select a model architecture (GCN, GAT, GraphSAGE, etc.)</li>
                         <li>Configure parameters and hyperparameters</li>
                         <li>Upload or select a dataset</li>
@@ -130,20 +522,40 @@
                         <li>Analyze results and visualize outputs</li>
                     </ol>
                     
-                    <h6>Supported Tasks</h6>
-                    <ul>
-                        <li><strong>Node Tasks:</strong> Classification and regression on graph nodes</li>
-                        <li><strong>Edge Tasks:</strong> Classification and link prediction on graph edges</li>
-                        <li><strong>Graph Tasks:</strong> Classification and regression on entire graphs</li>
-                        <li><strong>Community Detection:</strong> Find communities and clusters</li>
-                        <li><strong>Anomaly Detection:</strong> Detect anomalous nodes/edges/graphs</li>
-                        <li><strong>Graph Generation:</strong> Generate new graphs</li>
-                        <li><strong>Graph Embedding:</strong> Learn low-dimensional representations</li>
-                        <li><strong>Dynamic Graphs:</strong> Handle temporal graphs</li>
-                        <li><strong>Multi-Relational:</strong> Handle heterogeneous graphs</li>
-                    </ul>
+                    <h6><i class="fas fa-flask"></i> Available Applications:</h6>
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h6>Node Tasks</h6>
+                            <ul>
+                                <li><strong>Node Classification:</strong> Classify nodes into categories</li>
+                                <li><strong>Node Regression:</strong> Predict continuous values for nodes</li>
+                            </ul>
+                            
+                            <h6>Edge Tasks</h6>
+                            <ul>
+                                <li><strong>Edge Classification:</strong> Classify edges into types</li>
+                                <li><strong>Link Prediction:</strong> Predict missing or future edges</li>
+                            </ul>
+                        </div>
+                        <div class="col-md-6">
+                            <h6>Graph Tasks</h6>
+                            <ul>
+                                <li><strong>Graph Classification:</strong> Classify entire graphs</li>
+                                <li><strong>Graph Regression:</strong> Predict values for graphs</li>
+                            </ul>
+                            
+                            <h6>Specialized Applications</h6>
+                            <ul>
+                                <li><strong>Community Detection:</strong> Find communities in graphs</li>
+                                <li><strong>Anomaly Detection:</strong> Detect anomalous patterns</li>
+                                <li><strong>Graph Generation:</strong> Generate new graphs</li>
+                                <li><strong>Graph Embedding:</strong> Learn graph representations</li>
+                                <li><strong>Dynamic Graphs:</strong> Handle temporal graphs</li>
+                            </ul>
+                        </div>
+                    </div>
                     
-                    <h6>Popular Models</h6>
+                    <h6><i class="fas fa-cogs"></i> Popular Models:</h6>
                     <ul>
                         <li><strong>GCN:</strong> Graph Convolutional Network - foundational model</li>
                         <li><strong>GAT:</strong> Graph Attention Network - attention-based</li>
@@ -154,6 +566,53 @@
                 </div>
                 <div class="modal-footer">
                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="http://localhost:8000/docs" class="btn btn-primary" target="_blank">
+                        <i class="fas fa-code"></i> View API Documentation
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- About Modal -->
+    <div class="modal fade" id="aboutModal" tabindex="-1">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">
+                        <i class="fas fa-info-circle"></i> About GNN Research Platform
+                    </h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+                <div class="modal-body">
+                    <h6><i class="fas fa-rocket"></i> Platform Overview</h6>
+                    <p>This platform provides a comprehensive environment for exploring Graph Neural Networks (GNNs) across various applications. It combines modern web technologies with advanced machine learning techniques to solve complex graph-based problems.</p>
+                    
+                    <h6><i class="fas fa-cogs"></i> Technical Stack</h6>
+                    <ul>
+                        <li><strong>Backend:</strong> FastAPI with Python</li>
+                        <li><strong>Frontend:</strong> Modern HTML5, CSS3, JavaScript</li>
+                        <li><strong>Machine Learning:</strong> PyTorch for GNN implementation</li>
+                        <li><strong>Visualization:</strong> Chart.js for interactive charts</li>
+                        <li><strong>Styling:</strong> Bootstrap 5 with custom design system</li>
+                    </ul>
+                    
+                    <h6><i class="fas fa-graduation-cap"></i> Research Applications</h6>
+                    <p>The platform supports cutting-edge research in graph machine learning, enabling researchers to explore GNN applications in social networks, bioinformatics, recommendation systems, and many other domains.</p>
+                    
+                    <h6><i class="fas fa-users"></i> Target Users</h6>
+                    <ul>
+                        <li>Researchers in graph machine learning</li>
+                        <li>Data scientists working with graph data</li>
+                        <li>Students learning about GNNs</li>
+                        <li>Industry practitioners implementing GNN solutions</li>
+                    </ul>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <a href="https://github.com/kanhaiya-gupta/gnn-research-platform" class="btn btn-primary" target="_blank">
+                        <i class="fab fa-github"></i> View on GitHub
+                    </a>
                 </div>
             </div>
         </div>
