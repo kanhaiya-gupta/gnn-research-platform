@@ -14,13 +14,13 @@ from typing import Dict, Any
 # Import configuration
 from webapp.config.tasks import get_task_config, get_task_metadata
 from webapp.config.parameters import get_task_parameters, get_task_default_params
-from webapp.config.models import get_models_for_task
+from webapp.config.models import get_models_for_task, get_model_config
 
 # Create FastAPI router
 router = APIRouter(prefix="/graph_embedding_visualization", tags=["graph_embedding_visualization"])
 
 # Setup templates
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="webapp/templates")
 
 # Task configuration
 TASK_NAME = 'graph_embedding_visualization'

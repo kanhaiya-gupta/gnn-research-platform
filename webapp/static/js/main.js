@@ -222,15 +222,25 @@ function loadFromLocalStorage() {
 }
 
 function initializeCharts() {
+    // Prevent main.js from initializing charts on the results page
+    if (window.location.pathname.includes('/results/')) {
+        return;
+    }
     // Example chart initialization
     const chartElements = document.querySelectorAll('.chart-container');
     chartElements.forEach(container => {
         const ctx = container.querySelector('canvas');
         if (ctx) {
+            // Check if chart already exists and destroy it
+            if (ctx.chart) {
+                ctx.chart.destroy();
+            }
+            
             const chartType = container.dataset.chartType || 'line';
             const chartData = JSON.parse(container.dataset.chartData || '{}');
             
-            new Chart(ctx, {
+            // Create new chart and store reference
+            ctx.chart = new Chart(ctx, {
                 type: chartType,
                 data: chartData,
                 options: {

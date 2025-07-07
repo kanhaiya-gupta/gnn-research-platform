@@ -1,0 +1,333 @@
+{% extends "base.html" %}
+
+{% block title %}Node Classification Results{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    {% if error %}
+    <!-- Error State -->
+    <div class="row">
+        <div class="col-12">
+            <div class="alert alert-warning" role="alert">
+                <h4 class="alert-heading">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    No Results Found
+                </h4>
+                <p>{{ error }}</p>
+                <hr>
+                <p class="mb-0">
+                    <a href="/purpose/node_classification/experiment" class="btn btn-primary">
+                        <i class="fas fa-play"></i> Start New Experiment
+                    </a>
+                    <a href="/purpose/node_classification" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Node Classification
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div class="row">
+        <!-- Header -->
+        <div class="col-12">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-chart-bar text-primary"></i>
+                        Node Classification Results
+                    </h1>
+                    <p class="text-muted mb-0">
+                        Model: {{ results.model_name | default('GCN') }} | 
+                        Dataset: {{ results.dataset_name | default('Cora') }}
+                    </p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="exportResults('json')">
+                        <i class="fas fa-download"></i> Export JSON
+                    </button>
+                    <button class="btn btn-outline-success" onclick="exportResults('csv')">
+                        <i class="fas fa-file-csv"></i> Export CSV
+                    </button>
+                    <a href="/purpose/node_classification/experiment" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to Experiment
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Experiment Summary -->
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-info-circle"></i> Experiment Summary
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Model</small>
+                            <p class="mb-2"><strong>{{ results.model_name | default('GCN') | upper }}</strong></p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Dataset</small>
+                            <p class="mb-2"><strong>{{ results.dataset_name | default('Cora') }}</strong></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Experiment ID</small>
+                            <p class="mb-2"><strong id="experimentId">{{ results.experiment_id | default('exp_12345') }}</strong></p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Status</small>
+                            <p class="mb-2">
+                                <span class="badge bg-{{ 'success' if results.status == 'completed' else 'warning' if results.status == 'running' else 'secondary' }}">
+                                    {{ results.status | default('unknown') | title }}
+                                </span>
+                            </p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Start Time</small>
+                            <p class="mb-2"><strong>{{ results.start_time | default('N/A') }}</strong></p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Save Time</small>
+                            <p class="mb-2"><strong>{{ results.save_time | default('N/A') }}</strong></p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Model Parameters -->
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-cogs"></i> Model Parameters
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if results.parameters %}
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Hidden Dim</small>
+                            <p class="mb-2"><strong>{{ results.parameters.hidden_dim | default('64') }}</strong></p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Layers</small>
+                            <p class="mb-2"><strong>{{ results.parameters.num_layers | default('3') }}</strong></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Learning Rate</small>
+                            <p class="mb-2"><strong>{{ results.parameters.learning_rate | default('0.001') }}</strong></p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Dropout</small>
+                            <p class="mb-2"><strong>{{ results.parameters.dropout | default('0.1') }}</strong></p>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-6">
+                            <small class="text-muted">Optimizer</small>
+                            <p class="mb-2"><strong>{{ results.parameters.optimizer | default('Adam') }}</strong></p>
+                        </div>
+                        <div class="col-6">
+                            <small class="text-muted">Epochs</small>
+                            <p class="mb-2"><strong>{{ results.parameters.epochs | default('100') }}</strong></p>
+                        </div>
+                    </div>
+                    {% else %}
+                    <p class="text-muted">No parameters available</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+
+        <!-- Performance Metrics -->
+        <div class="col-lg-8">
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-tachometer-alt"></i> Performance Metrics
+                    </h5>
+                </div>
+                <div class="card-body">
+                    {% if results.metrics %}
+                    <div class="row">
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="text-center">
+                                <div class="h2 text-primary mb-1">{{ "%.1f"|format(results.metrics.accuracy * 100) if results.metrics.accuracy else 'N/A' }}%</div>
+                                <small class="text-muted">Accuracy</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="text-center">
+                                <div class="h2 text-success mb-1">{{ "%.1f"|format(results.metrics.f1_score * 100) if results.metrics.f1_score else 'N/A' }}%</div>
+                                <small class="text-muted">F1 Score</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="text-center">
+                                <div class="h2 text-info mb-1">{{ "%.1f"|format(results.metrics.precision * 100) if results.metrics.precision else 'N/A' }}%</div>
+                                <small class="text-muted">Precision</small>
+                            </div>
+                        </div>
+                        <div class="col-md-3 col-6 mb-3">
+                            <div class="text-center">
+                                <div class="h2 text-warning mb-1">{{ "%.1f"|format(results.metrics.recall * 100) if results.metrics.recall else 'N/A' }}%</div>
+                                <small class="text-muted">Recall</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% else %}
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i>
+                        No metrics available for this experiment.
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Training Curves -->
+            {% if results.training_history %}
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5 class="card-title mb-0">
+                        <i class="fas fa-chart-line"></i> Training Curves
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <canvas id="lossChart" height="200"></canvas>
+                        </div>
+                        <div class="col-md-6">
+                            <canvas id="accuracyChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+        </div>
+    </div>
+    {% endif %}
+</div>
+
+<script>
+// Export functions
+function exportResults(format) {
+    const experimentId = document.getElementById('experimentId').textContent;
+    const url = `/purpose/node_classification/api/export_results/${experimentId}?format_type=${format}`;
+    
+    fetch(url)
+        .then(response => {
+            if (response.ok) {
+                return response.blob();
+            }
+            throw new Error('Export failed');
+        })
+        .then(blob => {
+            const url = window.URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `results_${experimentId}.${format}`;
+            document.body.appendChild(a);
+            a.click();
+            window.URL.revokeObjectURL(url);
+            document.body.removeChild(a);
+        })
+        .catch(error => {
+            console.error('Export error:', error);
+            alert('Failed to export results');
+        });
+}
+
+{% if results and results.training_history %}
+// Training curves charts
+document.addEventListener('DOMContentLoaded', function() {
+    const trainingHistory = {{ results.training_history | tojson }};
+    
+    // Loss chart
+    const lossCtx = document.getElementById('lossChart').getContext('2d');
+    new Chart(lossCtx, {
+        type: 'line',
+        data: {
+            labels: trainingHistory.epochs || [],
+            datasets: [{
+                label: 'Train Loss',
+                data: trainingHistory.train_loss || [],
+                borderColor: 'rgb(75, 192, 192)',
+                backgroundColor: 'rgba(75, 192, 192, 0.1)',
+                tension: 0.1
+            }, {
+                label: 'Val Loss',
+                data: trainingHistory.val_loss || [],
+                borderColor: 'rgb(255, 99, 132)',
+                backgroundColor: 'rgba(255, 99, 132, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Training Loss'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
+    });
+    
+    // Accuracy chart
+    const accCtx = document.getElementById('accuracyChart').getContext('2d');
+    new Chart(accCtx, {
+        type: 'line',
+        data: {
+            labels: trainingHistory.epochs || [],
+            datasets: [{
+                label: 'Train Accuracy',
+                data: trainingHistory.train_acc || [],
+                borderColor: 'rgb(54, 162, 235)',
+                backgroundColor: 'rgba(54, 162, 235, 0.1)',
+                tension: 0.1
+            }, {
+                label: 'Val Accuracy',
+                data: trainingHistory.val_acc || [],
+                borderColor: 'rgb(255, 159, 64)',
+                backgroundColor: 'rgba(255, 159, 64, 0.1)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Training Accuracy'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 1
+                }
+            }
+        }
+    });
+});
+{% endif %}
+</script>
+{% endblock %} 

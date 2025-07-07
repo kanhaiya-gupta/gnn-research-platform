@@ -4,7 +4,7 @@ This module contains all routes for node classification tasks using FastAPI.
 """
 
 from fastapi import APIRouter, Request, HTTPException, Depends
-from fastapi.responses import HTMLResponse, JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse, Response
 from fastapi.templating import Jinja2Templates
 import json
 import os
@@ -15,12 +15,15 @@ import pandas as pd
 from typing import Dict, Any, Optional
 
 # Import configuration
-from config.tasks import get_task_config, get_task_metadata
-from config.parameters import get_task_parameters, get_task_default_params
-from config.models import get_models_for_task, get_model_config
+from webapp.config.tasks import get_task_config, get_task_metadata
+from webapp.config.parameters import get_task_parameters, get_task_default_params
+from webapp.config.models import get_models_for_task, get_model_config
 
 # Create APIRouter
-router = APIRouter(prefix="/node_classification", tags=["Node Classification"])
+router = APIRouter(tags=["Node Classification"])
+
+# Create API router
+api_router = APIRouter(prefix="/api", tags=["Node Classification API"])
 
 # Task configuration
 TASK_NAME = 'node_classification'
@@ -28,7 +31,29 @@ task_config = get_task_config(TASK_NAME)
 task_metadata = get_task_metadata(TASK_NAME)
 
 # Setup templates
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="webapp/templates")
+
+# Results storage directory
+RESULTS_DIR = "webapp/static/results"
+os.makedirs(RESULTS_DIR, exist_ok=True)
+
+def save_experiment_results(experiment_id: str, results: Dict[str, Any]):
+    """Save experiment results to file."""
+    filepath = os.path.join(RESULTS_DIR, f"experiment_{experiment_id}.json")
+    with open(filepath, 'w') as f:
+        json.dump(results, f, indent=2, default=str)
+
+def load_experiment_results(experiment_id: str) -> Optional[Dict[str, Any]]:
+    """Load experiment results from file."""
+    filepath = os.path.join(RESULTS_DIR, f"experiment_{experiment_id}.json")
+    if os.path.exists(filepath):
+        with open(filepath, 'r') as f:
+            return json.load(f)
+    return None
+
+def get_experiment_results(experiment_id: str) -> Optional[Dict[str, Any]]:
+    """Get experiment results, returning None if not found."""
+    return load_experiment_results(experiment_id)
 
 @router.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -65,44 +90,21 @@ async def experiment(request: Request):
 @router.get("/results", response_class=HTMLResponse)
 async def results(request: Request, experiment_id: str = "demo"):
     """Results page for node classification."""
-    # Mock results data for demonstration
-    results_data = {
-        'experiment_id': experiment_id,
-        'task_name': 'Node Classification',
-        'model_name': 'GCN',
-        'dataset_name': 'Cora',
-        'timestamp': datetime.now().isoformat(),
-        'metrics': {
-            'accuracy': 0.85,
-            'f1_score': 0.84,
-            'precision': 0.86,
-            'recall': 0.83
-        },
-        'training_history': {
-            'epochs': list(range(1, 101)),
-            'train_loss': [0.8, 0.7, 0.6, 0.5, 0.4, 0.35, 0.32, 0.3, 0.28, 0.26] + [0.25] * 90,
-            'val_loss': [0.85, 0.75, 0.65, 0.55, 0.45, 0.4, 0.37, 0.35, 0.33, 0.31] + [0.3] * 90,
-            'train_acc': [0.3, 0.45, 0.6, 0.7, 0.78, 0.82, 0.84, 0.85, 0.86, 0.87] + [0.88] * 90,
-            'val_acc': [0.25, 0.4, 0.55, 0.65, 0.73, 0.77, 0.79, 0.8, 0.81, 0.82] + [0.83] * 90
-        },
-        'confusion_matrix': [
-            [120, 5, 3, 2, 1, 0, 1],
-            [4, 115, 4, 2, 1, 0, 0],
-            [2, 3, 118, 3, 1, 0, 0],
-            [1, 2, 2, 116, 4, 1, 0],
-            [0, 1, 1, 3, 117, 3, 1],
-            [0, 0, 0, 1, 2, 115, 4],
-            [1, 0, 0, 0, 1, 3, 118]
-        ],
-        'class_names': ['Case_Based', 'Genetic_Algorithms', 'Neural_Networks', 
-                       'Probabilistic_Methods', 'Reinforcement_Learning', 
-                       'Rule_Learning', 'Theory'],
-        'node_embeddings': {
-            'embeddings': np.random.randn(2708, 64).tolist(),
-            'labels': np.random.randint(0, 7, 2708).tolist(),
-            'node_ids': list(range(2708))
-        }
-    }
+    # Try to load real results
+    results_data = load_experiment_results(experiment_id)
+    
+    if results_data is None:
+        # Return error page if no results found
+        return templates.TemplateResponse(
+            "node_tasks/classification/results.html",
+            {
+                "request": request,
+                "task_config": task_config,
+                "task_metadata": task_metadata,
+                "error": f"No results found for experiment {experiment_id}",
+                "results": None
+            }
+        )
     
     return templates.TemplateResponse(
         "node_tasks/classification/results.html",
@@ -140,8 +142,8 @@ async def start_experiment(data: Dict[str, Any]):
             'dataset_name': experiment_params.get('dataset', 'cora')
         }
         
-        # In a real implementation, you would save this to a database
-        # and start the training process
+        # Save initial experiment data
+        save_experiment_results(experiment_id, experiment_data)
         
         return {
             'success': True,
@@ -155,29 +157,37 @@ async def start_experiment(data: Dict[str, Any]):
 @router.get("/api/experiment_status/{experiment_id}")
 async def experiment_status(experiment_id: str):
     """Get the status of an experiment."""
-    # Mock status data
-    status_data = {
-        'experiment_id': experiment_id,
-        'status': 'running',
-        'progress': 0.65,
-        'current_epoch': 65,
-        'total_epochs': 100,
-        'current_metrics': {
-            'train_loss': 0.28,
-            'val_loss': 0.31,
-            'train_acc': 0.87,
-            'val_acc': 0.84
-        },
-        'estimated_time_remaining': '00:02:30'
-    }
+    results_data = load_experiment_results(experiment_id)
     
-    return status_data
+    if results_data is None:
+        raise HTTPException(status_code=404, detail="Experiment not found")
+    
+    # Return actual status from saved results
+    return {
+        'experiment_id': experiment_id,
+        'status': results_data.get('status', 'unknown'),
+        'progress': results_data.get('progress', 0),
+        'current_epoch': results_data.get('current_epoch', 0),
+        'total_epochs': results_data.get('total_epochs', 0),
+        'current_metrics': results_data.get('current_metrics', {}),
+        'estimated_time_remaining': results_data.get('estimated_time_remaining', '00:00:00')
+    }
 
 @router.post("/api/stop_experiment/{experiment_id}")
 async def stop_experiment(experiment_id: str):
     """Stop a running experiment."""
     try:
-        # In a real implementation, you would stop the training process
+        results_data = load_experiment_results(experiment_id)
+        
+        if results_data is None:
+            raise HTTPException(status_code=404, detail="Experiment not found")
+        
+        # Update status to stopped
+        results_data['status'] = 'stopped'
+        results_data['stop_time'] = datetime.now().isoformat()
+        
+        # Save updated results
+        save_experiment_results(experiment_id, results_data)
         
         return {
             'success': True,
@@ -204,151 +214,321 @@ async def get_parameters():
 async def validate_parameters(data: Dict[str, Any]):
     """Validate experiment parameters."""
     try:
-        parameters = data.get('parameters', {})
+        parameters = get_task_parameters(TASK_NAME)
+        experiment_params = data.get('parameters', {})
         
-        # Import validation function
-        from config.parameters import validate_parameter_value
+        # Basic validation
+        errors = []
         
-        validation_results = {}
-        is_valid = True
+        # Check required parameters
+        for param_name, param_config in parameters.items():
+            if param_config.get('required', False) and param_name not in experiment_params:
+                errors.append(f"Required parameter '{param_name}' is missing")
         
-        for param_name, value in parameters.items():
-            valid, result = validate_parameter_value(TASK_NAME, param_name, value)
-            validation_results[param_name] = {
-                'valid': valid,
-                'result': result
+        # Validate parameter types and ranges
+        for param_name, param_value in experiment_params.items():
+            if param_name in parameters:
+                param_config = parameters[param_name]
+                
+                # Type validation
+                expected_type = param_config.get('type', 'string')
+                if expected_type == 'number' and not isinstance(param_value, (int, float)):
+                    errors.append(f"Parameter '{param_name}' must be a number")
+                elif expected_type == 'integer' and not isinstance(param_value, int):
+                    errors.append(f"Parameter '{param_name}' must be an integer")
+                
+                # Range validation
+                if 'min' in param_config and param_value < param_config['min']:
+                    errors.append(f"Parameter '{param_name}' must be >= {param_config['min']}")
+                if 'max' in param_config and param_value > param_config['max']:
+                    errors.append(f"Parameter '{param_name}' must be <= {param_config['max']}")
+        
+        if errors:
+            return {
+                'valid': False,
+                'errors': errors
             }
-            if not valid:
-                is_valid = False
         
         return {
-            'valid': is_valid,
-            'validation_results': validation_results
+            'valid': True,
+            'message': 'Parameters are valid'
         }
         
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        return {
+            'valid': False,
+            'errors': [str(e)]
+        }
 
 @router.get("/api/get_experiment_results/{experiment_id}")
-async def get_experiment_results(experiment_id: str):
-    """Get results for a completed experiment."""
-    # Mock results data
-    results_data = {
-        'experiment_id': experiment_id,
-        'task_name': 'Node Classification',
-        'model_name': 'GCN',
-        'dataset_name': 'Cora',
-        'timestamp': datetime.now().isoformat(),
-        'parameters': {
-            'hidden_dim': 64,
-            'num_layers': 3,
-            'dropout': 0.1,
-            'learning_rate': 0.001,
-            'epochs': 100
-        },
-        'metrics': {
-            'accuracy': 0.85,
-            'f1_score': 0.84,
-            'precision': 0.86,
-            'recall': 0.83
-        },
-        'training_history': {
-            'epochs': list(range(1, 101)),
-            'train_loss': [0.8, 0.7, 0.6, 0.5, 0.4, 0.35, 0.32, 0.3, 0.28, 0.26] + [0.25] * 90,
-            'val_loss': [0.85, 0.75, 0.65, 0.55, 0.45, 0.4, 0.37, 0.35, 0.33, 0.31] + [0.3] * 90,
-            'train_acc': [0.3, 0.45, 0.6, 0.7, 0.78, 0.82, 0.84, 0.85, 0.86, 0.87] + [0.88] * 90,
-            'val_acc': [0.25, 0.4, 0.55, 0.65, 0.73, 0.77, 0.79, 0.8, 0.81, 0.82] + [0.83] * 90
-        },
-        'confusion_matrix': [
-            [120, 5, 3, 2, 1, 0, 1],
-            [4, 115, 4, 2, 1, 0, 0],
-            [2, 3, 118, 3, 1, 0, 0],
-            [1, 2, 2, 116, 4, 1, 0],
-            [0, 1, 1, 3, 117, 3, 1],
-            [0, 0, 0, 1, 2, 115, 4],
-            [1, 0, 0, 0, 1, 3, 118]
-        ],
-        'class_names': ['Case_Based', 'Genetic_Algorithms', 'Neural_Networks', 
-                       'Probabilistic_Methods', 'Reinforcement_Learning', 
-                       'Rule_Learning', 'Theory']
-    }
+async def get_experiment_results_api(experiment_id: str):
+    """Get experiment results via API."""
+    results_data = load_experiment_results(experiment_id)
+    
+    if results_data is None:
+        raise HTTPException(status_code=404, detail="Experiment results not found")
     
     return results_data
 
 @router.get("/api/get_node_embeddings/{experiment_id}")
 async def get_node_embeddings(experiment_id: str):
     """Get node embeddings for visualization."""
-    # Mock embeddings data
-    embeddings_data = {
-        'experiment_id': experiment_id,
-        'embeddings': np.random.randn(2708, 64).tolist(),
-        'labels': np.random.randint(0, 7, 2708).tolist(),
-        'node_ids': list(range(2708)),
-        'class_names': ['Case_Based', 'Genetic_Algorithms', 'Neural_Networks', 
-                       'Probabilistic_Methods', 'Reinforcement_Learning', 
-                       'Rule_Learning', 'Theory']
-    }
+    results_data = load_experiment_results(experiment_id)
     
-    return embeddings_data
+    if results_data is None:
+        raise HTTPException(status_code=404, detail="Experiment results not found")
+    
+    # Return embeddings if available
+    embeddings = results_data.get('node_embeddings', {})
+    if not embeddings:
+        raise HTTPException(status_code=404, detail="Node embeddings not available")
+    
+    return embeddings
+
+@router.post("/api/save_model/{experiment_id}")
+async def save_model(experiment_id: str, model_data: dict):
+    """Save a trained model."""
+    try:
+        results_data = load_experiment_results(experiment_id)
+        
+        if results_data is None:
+            raise HTTPException(status_code=404, detail="Experiment not found")
+        
+        # Add model data to results
+        results_data['saved_model'] = {
+            'model_data': model_data,
+            'save_time': datetime.now().isoformat(),
+            'model_path': f"models/{experiment_id}_model.pth"
+        }
+        
+        # Save updated results
+        save_experiment_results(experiment_id, results_data)
+        
+        return {
+            'success': True,
+            'message': f'Model saved successfully for experiment {experiment_id}'
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/api/list_saved_models")
+async def list_saved_models():
+    """List all saved models."""
+    try:
+        saved_models = []
+        
+        # Scan results directory for saved models
+        for filename in os.listdir(RESULTS_DIR):
+            if filename.startswith('experiment_') and filename.endswith('.json'):
+                experiment_id = filename.replace('experiment_', '').replace('.json', '')
+                results_data = load_experiment_results(experiment_id)
+                
+                if results_data and 'saved_model' in results_data:
+                    saved_models.append({
+                        'experiment_id': experiment_id,
+                        'model_name': results_data.get('model_name', 'Unknown'),
+                        'dataset_name': results_data.get('dataset_name', 'Unknown'),
+                        'save_time': results_data['saved_model']['save_time'],
+                        'model_path': results_data['saved_model']['model_path']
+                    })
+        
+        return {
+            'saved_models': saved_models,
+            'count': len(saved_models)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.get("/api/load_model/{experiment_id}")
+async def load_model(experiment_id: str):
+    """Load a saved model."""
+    try:
+        results_data = load_experiment_results(experiment_id)
+        
+        if results_data is None:
+            raise HTTPException(status_code=404, detail="Experiment not found")
+        
+        if 'saved_model' not in results_data:
+            raise HTTPException(status_code=404, detail="No saved model found")
+        
+        return {
+            'success': True,
+            'model_data': results_data['saved_model']['model_data'],
+            'model_path': results_data['saved_model']['model_path']
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.delete("/api/delete_model/{experiment_id}")
+async def delete_model(experiment_id: str):
+    """Delete a saved model."""
+    try:
+        results_data = load_experiment_results(experiment_id)
+        
+        if results_data is None:
+            raise HTTPException(status_code=404, detail="Experiment not found")
+        
+        if 'saved_model' not in results_data:
+            raise HTTPException(status_code=404, detail="No saved model found")
+        
+        # Remove saved model data
+        del results_data['saved_model']
+        
+        # Save updated results
+        save_experiment_results(experiment_id, results_data)
+        
+        return {
+            'success': True,
+            'message': f'Model deleted successfully for experiment {experiment_id}'
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/api/export_results/{experiment_id}")
 async def export_results(experiment_id: str, format_type: str = "json"):
     """Export experiment results."""
-    # Get results data
-    results_data = {
-        'experiment_id': experiment_id,
-        'task_name': 'Node Classification',
-        'model_name': 'GCN',
-        'dataset_name': 'Cora',
-        'timestamp': datetime.now().isoformat(),
-        'metrics': {
-            'accuracy': 0.85,
-            'f1_score': 0.84,
-            'precision': 0.86,
-            'recall': 0.83
-        }
-    }
-    
-    if format_type == 'csv':
-        # Convert to CSV format
-        import io
-        output = io.StringIO()
-        df = pd.DataFrame([results_data])
-        df.to_csv(output, index=False)
-        output.seek(0)
+    try:
+        results_data = load_experiment_results(experiment_id)
         
-        from fastapi.responses import Response
-        return Response(
-            content=output.getvalue(),
-            media_type='text/csv',
-            headers={'Content-Disposition': f'attachment; filename=node_classification_results_{experiment_id}.csv'}
+        if results_data is None:
+            raise HTTPException(status_code=404, detail="Experiment results not found")
+        
+        if format_type.lower() == "json":
+            return JSONResponse(content=results_data)
+        elif format_type.lower() == "csv":
+            # Convert results to CSV format
+            csv_data = []
+            for key, value in results_data.items():
+                if isinstance(value, dict):
+                    for sub_key, sub_value in value.items():
+                        csv_data.append([f"{key}.{sub_key}", str(sub_value)])
+                else:
+                    csv_data.append([key, str(value)])
+            
+            import io
+            output = io.StringIO()
+            import csv
+            writer = csv.writer(output)
+            writer.writerow(['Parameter', 'Value'])
+            writer.writerows(csv_data)
+            
+            return Response(
+                content=output.getvalue(),
+                media_type="text/csv",
+                headers={"Content-Disposition": f"attachment; filename=results_{experiment_id}.csv"}
+            )
+        else:
+            raise HTTPException(status_code=400, detail="Unsupported format type")
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
+
+@router.post("/api/export_config/{experiment_id}")
+async def export_config(experiment_id: str, config_data: dict):
+    """Export experiment configuration."""
+    try:
+        results_data = load_experiment_results(experiment_id)
+        
+        if results_data is None:
+            raise HTTPException(status_code=404, detail="Experiment not found")
+        
+        # Create config export
+        config_export = {
+            'experiment_id': experiment_id,
+            'task_name': TASK_NAME,
+            'parameters': results_data.get('parameters', {}),
+            'model_name': results_data.get('model_name', ''),
+            'dataset_name': results_data.get('dataset_name', ''),
+            'export_time': datetime.now().isoformat(),
+            'additional_config': config_data
+        }
+        
+        return JSONResponse(
+            content=config_export,
+            headers={"Content-Disposition": f"attachment; filename=config_{experiment_id}.json"}
         )
-    else:
-        # Return JSON
-        return results_data
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/api/get_attention_weights/{experiment_id}")
-async def get_attention_weights(experiment_id: str):
-    """Get attention weights for GAT models."""
-    # Mock attention weights data
-    attention_data = {
-        'experiment_id': experiment_id,
-        'attention_weights': np.random.rand(100, 8).tolist(),  # 100 nodes, 8 attention heads
-        'node_ids': list(range(100)),
-        'head_names': [f'Head_{i+1}' for i in range(8)]
-    }
-    
-    return attention_data
+@router.get("/api/list_configs")
+async def list_configs():
+    """List all experiment configurations."""
+    try:
+        configs = []
+        
+        # Scan results directory for experiments
+        for filename in os.listdir(RESULTS_DIR):
+            if filename.startswith('experiment_') and filename.endswith('.json'):
+                experiment_id = filename.replace('experiment_', '').replace('.json', '')
+                results_data = load_experiment_results(experiment_id)
+                
+                if results_data:
+                    configs.append({
+                        'experiment_id': experiment_id,
+                        'task_name': results_data.get('task_name', 'Unknown'),
+                        'model_name': results_data.get('model_name', 'Unknown'),
+                        'dataset_name': results_data.get('dataset_name', 'Unknown'),
+                        'start_time': results_data.get('start_time', ''),
+                        'status': results_data.get('status', 'unknown')
+                    })
+        
+        return {
+            'configs': configs,
+            'count': len(configs)
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/api/get_feature_importance/{experiment_id}")
-async def get_feature_importance(experiment_id: str):
-    """Get feature importance scores."""
-    # Mock feature importance data
-    feature_importance = {
-        'experiment_id': experiment_id,
-        'feature_names': [f'Feature_{i}' for i in range(1433)],
-        'importance_scores': np.random.rand(1433).tolist(),
-        'top_features': [f'Feature_{i}' for i in range(20)]
-    }
+@router.get("/api/results/{experiment_id}")
+async def results_page(request: Request, experiment_id: str):
+    """Results page for a specific experiment."""
+    results_data = load_experiment_results(experiment_id)
     
-    return feature_importance
+    if results_data is None:
+        # Return error page if no results found
+        return templates.TemplateResponse(
+            "node_tasks/classification/results.html",
+            {
+                "request": request,
+                "task_config": task_config,
+                "task_metadata": task_metadata,
+                "error": f"No results found for experiment {experiment_id}",
+                "results": None
+            }
+        )
+    
+    return templates.TemplateResponse(
+        "node_tasks/classification/results.html",
+        {
+            "request": request,
+            "task_config": task_config,
+            "task_metadata": task_metadata,
+            "results": results_data
+        }
+    )
+
+@router.post("/api/save_experiment_results/{experiment_id}")
+async def save_experiment_results_api(experiment_id: str, results_data: dict):
+    """Save experiment results after training."""
+    try:
+        # Add metadata
+        results_data['experiment_id'] = experiment_id
+        results_data['save_time'] = datetime.now().isoformat()
+        results_data['status'] = 'completed'
+        
+        # Save results
+        save_experiment_results(experiment_id, results_data)
+        
+        return {
+            'success': True,
+            'message': f'Results saved successfully for experiment {experiment_id}'
+        }
+        
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))

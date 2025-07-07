@@ -15,9 +15,9 @@ import pandas as pd
 from typing import Dict, Any, Optional
 
 # Import configuration
-from config.tasks import get_task_config, get_task_metadata
-from config.parameters import get_task_parameters, get_task_default_params
-from config.models import get_models_for_task, get_model_config
+from webapp.config.tasks import get_task_config, get_task_metadata
+from webapp.config.parameters import get_task_parameters, get_task_default_params
+from webapp.config.models import get_models_for_task, get_model_config
 
 # Create FastAPI router
 router = APIRouter(prefix="/anomaly_detection", tags=["Anomaly Detection"])
@@ -28,7 +28,7 @@ task_config = get_task_config(TASK_NAME)
 task_metadata = get_task_metadata(TASK_NAME)
 
 # Setup templates
-templates = Jinja2Templates(directory="templates")
+templates = Jinja2Templates(directory="webapp/templates")
 
 @router.get("/", response_class=HTMLResponse)
 async def index(request: Request):
@@ -204,7 +204,7 @@ async def validate_parameters(data: Dict[str, Any]):
         parameters = data.get('parameters', {})
         
         # Import validation function
-        from config.parameters import validate_parameter_value
+        from webapp.config.parameters import validate_parameter_value
         
         validation_results = {}
         is_valid = True

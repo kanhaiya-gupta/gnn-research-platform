@@ -195,6 +195,110 @@ results = run_embedding_visualization_experiment(config)
 - **Experiment Pages**: Training interface for each model
 - **Results Pages**: Analysis and visualization
 
+## 📊 Data Preprocessing
+
+### Standard Data Format
+All models in our platform expect data in **PyTorch Geometric Data** format:
+- **`x`**: Node features tensor (num_nodes × num_features)
+- **`edge_index`**: Edge connectivity tensor (2 × num_edges)
+- **`edge_attr`**: Edge features tensor (num_edges × num_edge_features) - optional
+- **`y`**: Target values tensor (num_nodes/num_edges/num_graphs × num_targets)
+- **`train_mask`**, **`val_mask`**, **`test_mask`**: Boolean masks for data splitting - optional
+
+### Supported Input Formats
+
+#### 1. CSV Files
+```python
+from utils.data_utils import csv_to_pytorch_geometric
+
+# Convert CSV files to PyTorch Geometric format
+data = csv_to_pytorch_geometric(
+    edges_file="edges.csv",           # Required: source, target, [edge_features]
+    nodes_file="nodes.csv",           # Optional: node_id, [node_features], [target]
+    node_features=["feature1", "feature2"],  # Optional: column names for node features
+    edge_features=["weight", "type"],        # Optional: column names for edge features
+    target_column="label",                   # Optional: column name for target values
+    task_type="node_classification"          # Required: task type
+)
+```
+
+#### 2. NetworkX Graphs
+```python
+import networkx as nx
+from utils.data_utils import networkx_to_pytorch_geometric
+
+# Convert NetworkX graph to PyTorch Geometric format
+data = networkx_to_pytorch_geometric(
+    graph=graph,
+    node_features={"feature1": "attr1", "feature2": "attr2"},  # Optional
+    edge_features={"weight": "weight", "type": "type"},        # Optional
+    target_attribute="label"                                   # Optional
+)
+```
+
+#### 3. Adjacency Matrices
+```python
+import numpy as np
+from utils.data_utils import adjacency_matrix_to_pytorch_geometric
+
+# Convert adjacency matrix to PyTorch Geometric format
+data = adjacency_matrix_to_pytorch_geometric(
+    adjacency_matrix=adj_matrix,
+    node_features=node_features,
+    targets=targets
+)
+```
+
+### Preprocessing Pipeline
+```python
+from utils.data_utils import load_and_preprocess_data
+
+# One-step preprocessing
+data = load_and_preprocess_data(
+    data_path="data/edges.csv",
+    data_format="csv",
+    task_type="node_classification",
+    preprocessing_steps=[
+        "normalize_features",
+        "encode_categorical", 
+        "split_data",
+        "validate"
+    ],
+    nodes_file="data/nodes.csv",
+    node_features=["feature1", "feature2"],
+    target_column="label"
+)
+```
+
+### Data Validation
+```python
+from utils.data_utils import validate_graph_data, get_data_info
+
+# Validate data for specific task
+is_valid = validate_graph_data(data, task_type="node_classification")
+
+# Get comprehensive data information
+info = get_data_info(data)
+print(f"Nodes: {info['num_nodes']}, Edges: {info['num_edges']}")
+print(f"Node features: {info['num_node_features']}")
+print(f"Classes: {info['num_classes']}")
+```
+
+### Task-Specific Requirements
+
+| Task | Required | Optional | Data Splitting |
+|------|----------|----------|----------------|
+| **Node Classification/Regression** | Node features (`x`), Node targets (`y`) | Edge features (`edge_attr`) | Node-level masks |
+| **Edge Classification/Link Prediction** | Node features (`x`) | Edge features (`edge_attr`), Edge targets (`y`) | Edge-level masks |
+| **Graph Classification/Regression** | Node features (`x`), Graph targets (`y`) | Edge features (`edge_attr`) | Graph-level splitting |
+| **Community Detection** | Node features (`x`) | Edge features (`edge_attr`) | No targets needed |
+| **Anomaly Detection** | Node features (`x`) | Edge features (`edge_attr`) | No targets needed |
+
+### Examples and Testing
+- **[Data Preprocessing Guide](docs/data_preprocessing.md)**: Comprehensive preprocessing documentation
+- **[Preprocessing Examples](examples/data_preprocessing_example.py)**: Practical examples with different formats
+- **[Preprocessing Tests](test_data_preprocessing.py)**: Test suite for preprocessing utilities
+
 ## 🔧 Configuration
 
 ### Environment Variables
