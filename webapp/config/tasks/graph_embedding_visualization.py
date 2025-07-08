@@ -1,27 +1,27 @@
 """
-Graph Embedding Task Configuration
-This module defines the configuration for graph embedding tasks.
+Graph Embedding Visualization Task Configuration
+This module defines the configuration for graph embedding visualization tasks.
 """
 
-from ..parameters.graph_embedding import (
-    GRAPH_EMBEDDING_PARAMETERS,
-    DEFAULT_GRAPH_EMBEDDING_PARAMS,
+from ..parameters.graph_embedding_visualization import (
+    GRAPH_EMBEDDING_VISUALIZATION_PARAMETERS,
+    DEFAULT_GRAPH_EMBEDDING_VISUALIZATION_PARAMS,
     PARAMETER_CATEGORIES
 )
 
-GRAPH_EMBEDDING_TASK = {
+GRAPH_EMBEDDING_VISUALIZATION_TASK = {
     'name': 'Graph Embedding Visualization',
     'description': 'Learn and visualize graph embeddings for nodes, edges, and graphs',
     'category': 'embedding',
     'icon': 'fas fa-eye',
     'color': 'secondary',
-    'parameters': GRAPH_EMBEDDING_PARAMETERS,
-    'default_params': DEFAULT_GRAPH_EMBEDDING_PARAMS,
+    'parameters': GRAPH_EMBEDDING_VISUALIZATION_PARAMETERS,
+    'default_params': DEFAULT_GRAPH_EMBEDDING_VISUALIZATION_PARAMS,
     'parameter_categories': PARAMETER_CATEGORIES,
     
     # Task-specific configuration
     'supported_models': [
-        'gcn', 'gat', 'graphsage', 'gin', 'chebnet', 'sgc'
+        'node2vec', 'deepwalk', 'line', 'sdne', 'graphsage', 'gcn', 'gat', 'gin'
     ],
     'supported_datasets': [
         'synthetic', 'cora', 'citeseer', 'pubmed', 'amazon_photo', 'amazon_computers',
@@ -101,4 +101,4 @@ TASK_METADATA = {
     'estimated_time': '30-60 minutes',
     'required_knowledge': 'Basic understanding of embeddings and visualization',
     'tags': ['embedding', 'visualization', 'unsupervised', 'dimensionality_reduction', 'clustering']
-}
+} 

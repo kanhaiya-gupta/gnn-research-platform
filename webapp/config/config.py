@@ -74,7 +74,7 @@ DATASET_CONFIG = {
         'community_detection': ['karate', 'football', 'polbooks'],
         'anomaly_detection': ['cora', 'citeseer', 'pubmed'],
         'graph_generation': ['zinc', 'qm9', 'mutag'],
-        'graph_embedding': ['cora', 'citeseer', 'pubmed'],
+        'graph_embedding_visualization': ['cora', 'citeseer', 'pubmed'],
         'dynamic_graph_learning': ['enron', 'uc_irvine', 'facebook']
     },
     
@@ -674,7 +674,9 @@ class Config:
                     'category': model_config['category'],
                     'paper': model_config['paper'],
                     'architecture': model_config['architecture'],
-                    'inductive': model_config['inductive']
+                    'inductive': model_config['inductive'],
+                    'formula': model_config.get('formula', ''),
+                    'applications': model_config.get('applications', [])
                 }
         
         return models

@@ -8,7 +8,7 @@
         background: white;
         border-radius: 12px;
         padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     
@@ -43,33 +43,45 @@
         color: white;
         border-radius: 12px;
         padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
     
-    .progress-section {
+    .live-monitor {
         background: white;
         border-radius: 12px;
         padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .metric-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary);
+    }
+    
+    .metric-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
     }
     
     .chart-container {
         height: 300px;
-        margin-bottom: 1rem;
-    }
-    
-    .model-info {
-        background: rgba(255,255,255,0.1);
-        border-radius: 8px;
-        padding: 1rem;
-        margin-bottom: 1rem;
-    }
-    
-    .dataset-info {
-        background: rgba(255,255,255,0.1);
-        border-radius: 8px;
-        padding: 1rem;
         margin-bottom: 1rem;
     }
 </style>
@@ -98,8 +110,8 @@
     </div>
 
     <div class="row">
-        <!-- Left Column - Parameters and Controls -->
-        <div class="col-lg-8">
+        <!-- Main Content - Parameters -->
+        <div class="col-12">
             <!-- Model Information -->
             <div class="parameter-section">
                 <h4><i class="fas fa-info-circle"></i> Model Information</h4>
@@ -124,7 +136,7 @@
                         <div class="parameter-group">
                             <label for="hidden_dim" class="form-label">Hidden Dimension</label>
                             <input type="number" class="form-control" id="hidden_dim" name="hidden_dim" 
-                                   value="{{ default_params.hidden_dim }}" min="16" max="512" step="16">
+                                   value="64" min="16" max="512" step="16">
                             <div class="form-text">Dimension of hidden layers (16-512)</div>
                         </div>
                     </div>
@@ -132,7 +144,7 @@
                         <div class="parameter-group">
                             <label for="num_layers" class="form-label">Number of Layers</label>
                             <input type="number" class="form-control" id="num_layers" name="num_layers" 
-                                   value="{{ default_params.num_layers }}" min="1" max="10">
+                                   value="3" min="1" max="10">
                             <div class="form-text">Number of GNN layers (1-10)</div>
                         </div>
                     </div>
@@ -142,7 +154,7 @@
                         <div class="parameter-group">
                             <label for="dropout" class="form-label">Dropout Rate</label>
                             <input type="number" class="form-control" id="dropout" name="dropout" 
-                                   value="{{ default_params.dropout }}" min="0.0" max="0.5" step="0.1">
+                                   value="0.1" min="0.0" max="0.5" step="0.1">
                             <div class="form-text">Dropout rate for regularization (0.0-0.5)</div>
                         </div>
                     </div>
@@ -164,7 +176,7 @@
                         <div class="parameter-group">
                             <label for="num_communities" class="form-label">Number of Communities</label>
                             <input type="number" class="form-control" id="num_communities" name="num_communities" 
-                                   value="{{ default_params.num_communities }}" min="2" max="100" step="1">
+                                   value="5" min="2" max="100" step="1">
                             <div class="form-text">Expected number of communities (2-100)</div>
                         </div>
                     </div>
@@ -178,8 +190,30 @@
                                 <option value="louvain">Louvain Method</option>
                                 <option value="girvan_newman">Girvan-Newman</option>
                                 <option value="infomap">InfoMap</option>
+                                <option value="walktrap">WalkTrap</option>
+                                <option value="fastgreedy">FastGreedy</option>
+                                <option value="leading_eigenvector">Leading Eigenvector</option>
+                                <option value="spinglass">Spinglass</option>
                             </select>
                             <div class="form-text">Community detection algorithm</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="embedding_dim" class="form-label">Community Embedding Dimension</label>
+                            <input type="number" class="form-control" id="embedding_dim" name="embedding_dim" 
+                                   value="32" min="8" max="256" step="8">
+                            <div class="form-text">Dimension of community embeddings (8-256)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="attention_heads" class="form-label">Attention Heads</label>
+                            <input type="number" class="form-control" id="attention_heads" name="attention_heads" 
+                                   value="4" min="1" max="16" step="1">
+                            <div class="form-text">Number of attention heads (1-16)</div>
                         </div>
                     </div>
                 </div>
@@ -193,7 +227,7 @@
                         <div class="parameter-group">
                             <label for="learning_rate" class="form-label">Learning Rate</label>
                             <input type="number" class="form-control" id="learning_rate" name="learning_rate" 
-                                   value="{{ default_params.learning_rate }}" min="0.00001" max="0.1" step="0.0001">
+                                   value="0.001" min="0.00001" max="0.1" step="0.0001">
                             <div class="form-text">Learning rate for optimization</div>
                         </div>
                     </div>
@@ -201,7 +235,7 @@
                         <div class="parameter-group">
                             <label for="epochs" class="form-label">Number of Epochs</label>
                             <input type="number" class="form-control" id="epochs" name="epochs" 
-                                   value="{{ default_params.epochs }}" min="10" max="1000">
+                                   value="100" min="10" max="1000">
                             <div class="form-text">Number of training epochs</div>
                         </div>
                     </div>
@@ -211,7 +245,7 @@
                         <div class="parameter-group">
                             <label for="batch_size" class="form-label">Batch Size</label>
                             <input type="number" class="form-control" id="batch_size" name="batch_size" 
-                                   value="{{ default_params.batch_size }}" min="1" max="256">
+                                   value="32" min="1" max="256">
                             <div class="form-text">Batch size for training</div>
                         </div>
                     </div>
@@ -231,9 +265,53 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="parameter-group">
+                            <label for="weight_decay" class="form-label">Weight Decay</label>
+                            <input type="number" class="form-control" id="weight_decay" name="weight_decay" 
+                                   value="0.0001" min="0.0" max="0.1" step="0.0001">
+                            <div class="form-text">L2 regularization coefficient</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="scheduler" class="form-label">Learning Rate Scheduler</label>
+                            <select class="form-select" id="scheduler" name="scheduler">
+                                <option value="none">None</option>
+                                <option value="step">Step LR</option>
+                                <option value="cosine">Cosine Annealing</option>
+                                <option value="plateau">Reduce on Plateau</option>
+                            </select>
+                            <div class="form-text">Learning rate scheduling strategy</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="patience" class="form-label">Early Stopping Patience</label>
+                            <input type="number" class="form-control" id="patience" name="patience" 
+                                   value="10" min="1" max="50">
+                            <div class="form-text">Number of epochs to wait before early stopping</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="loss_function" class="form-label">Loss Function</label>
+                            <select class="form-select" id="loss_function" name="loss_function">
+                                <option value="modularity">Modularity Loss</option>
+                                <option value="reconstruction">Reconstruction Loss</option>
+                                <option value="clustering">Clustering Loss</option>
+                                <option value="combined">Combined Loss</option>
+                            </select>
+                            <div class="form-text">Loss function for community detection</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
                             <label for="modularity_weight" class="form-label">Modularity Weight</label>
                             <input type="number" class="form-control" id="modularity_weight" name="modularity_weight" 
-                                   value="{{ default_params.modularity_weight }}" min="0.0" max="1.0" step="0.1">
+                                   value="0.5" min="0.0" max="1.0" step="0.1">
                             <div class="form-text">Weight for modularity loss (0.0-1.0)</div>
                         </div>
                     </div>
@@ -241,7 +319,7 @@
                         <div class="parameter-group">
                             <label for="regularization_weight" class="form-label">Regularization Weight</label>
                             <input type="number" class="form-control" id="regularization_weight" name="regularization_weight" 
-                                   value="{{ default_params.regularization_weight }}" min="0.0" max="1.0" step="0.01">
+                                   value="0.1" min="0.0" max="1.0" step="0.01">
                             <div class="form-text">Weight for regularization loss (0.0-1.0)</div>
                         </div>
                     </div>
@@ -268,6 +346,9 @@
                                 <option value="reddit">Reddit Social Network</option>
                                 <option value="amazon">Amazon Co-purchase Network</option>
                                 <option value="dblp">DBLP Collaboration Network</option>
+                                <option value="youtube">YouTube Social Network</option>
+                                <option value="livejournal">LiveJournal Social Network</option>
+                                <option value="orkut">Orkut Social Network</option>
                             </select>
                             <div class="form-text">Select a graph dataset</div>
                         </div>
@@ -276,7 +357,7 @@
                         <div class="parameter-group">
                             <label for="validation_split" class="form-label">Validation Split</label>
                             <input type="number" class="form-control" id="validation_split" name="validation_split" 
-                                   value="{{ default_params.validation_split }}" min="0.1" max="0.5" step="0.1">
+                                   value="0.2" min="0.1" max="0.5" step="0.1">
                             <div class="form-text">Fraction of edges for validation</div>
                         </div>
                     </div>
@@ -286,7 +367,7 @@
                         <div class="parameter-group">
                             <label for="test_split" class="form-label">Test Split</label>
                             <input type="number" class="form-control" id="test_split" name="test_split" 
-                                   value="{{ default_params.test_split }}" min="0.1" max="0.5" step="0.1">
+                                   value="0.2" min="0.1" max="0.5" step="0.1">
                             <div class="form-text">Fraction of edges for testing</div>
                         </div>
                     </div>
@@ -294,8 +375,32 @@
                         <div class="parameter-group">
                             <label for="resolution" class="form-label">Resolution Parameter</label>
                             <input type="number" class="form-control" id="resolution" name="resolution" 
-                                   value="{{ default_params.resolution }}" min="0.1" max="10.0" step="0.1">
+                                   value="1.0" min="0.1" max="10.0" step="0.1">
                             <div class="form-text">Resolution parameter for modularity (0.1-10.0)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="min_community_size" class="form-label">Min Community Size</label>
+                            <input type="number" class="form-control" id="min_community_size" name="min_community_size" 
+                                   value="3" min="2" max="50" step="1">
+                            <div class="form-text">Minimum size for a community (2-50)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="evaluation_metric" class="form-label">Evaluation Metric</label>
+                            <select class="form-select" id="evaluation_metric" name="evaluation_metric">
+                                <option value="modularity">Modularity</option>
+                                <option value="nmi">Normalized Mutual Information</option>
+                                <option value="ari">Adjusted Rand Index</option>
+                                <option value="conductance">Conductance</option>
+                                <option value="coverage">Coverage</option>
+                                <option value="performance">Performance</option>
+                            </select>
+                            <div class="form-text">Primary evaluation metric</div>
                         </div>
                     </div>
                 </div>
@@ -305,125 +410,95 @@
             <div class="training-controls">
                 <h4><i class="fas fa-play-circle"></i> Training Controls</h4>
                 <div class="row">
-                    <div class="col-md-6">
-                        <button type="button" class="btn btn-light btn-lg w-100 mb-3" id="startTraining">
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-success btn-lg w-100 mb-3" id="startTraining">
                             <i class="fas fa-play"></i> Start Training
                         </button>
                     </div>
-                    <div class="col-md-6">
-                        <button type="button" class="btn btn-outline-light btn-lg w-100 mb-3" id="stopTraining" disabled>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-danger btn-lg w-100 mb-3" id="stopTraining" disabled>
                             <i class="fas fa-stop"></i> Stop Training
                         </button>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <button type="button" class="btn btn-outline-light w-100" id="resetTraining">
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-warning btn-lg w-100 mb-3" id="resetTraining">
                             <i class="fas fa-redo"></i> Reset Training
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Right Column - Progress and Results -->
-        <div class="col-lg-4">
-            <!-- Training Progress -->
-            <div class="progress-section">
-                <h4><i class="fas fa-chart-line"></i> Training Progress</h4>
-                <div id="trainingProgress" style="display: none;">
-                    <div class="mb-3">
-                        <label class="form-label">Epoch Progress</label>
-                        <div class="progress mb-2">
-                            <div class="progress-bar" id="epochProgress" role="progressbar" style="width: 0%"></div>
-                        </div>
-                        <small class="text-muted" id="epochText">0 / 0 epochs</small>
+            <!-- Live Training Monitor -->
+            <div class="live-monitor" id="liveMonitor" style="display: none;">
+                <h4><i class="fas fa-chart-line"></i> Live Training Monitor</h4>
+                
+                <!-- Training Progress -->
+                <div class="mb-4">
+                    <label class="form-label">Epoch Progress</label>
+                    <div class="progress mb-2">
+                        <div class="progress-bar" id="epochProgress" role="progressbar" style="width: 0%"></div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Overall Progress</label>
-                        <div class="progress mb-2">
-                            <div class="progress-bar bg-success" id="overallProgress" role="progressbar" style="width: 0%"></div>
-                        </div>
-                        <small class="text-muted" id="overallText">0% complete</small>
+                    <small class="text-muted" id="epochText">0 / 0 epochs</small>
+                </div>
+
+                <!-- Live Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentLoss">-</div>
+                        <div class="metric-label">Training Loss</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentModularity">-</div>
+                        <div class="metric-label">Modularity</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="validationLoss">-</div>
+                        <div class="metric-label">Validation Loss</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="validationModularity">-</div>
+                        <div class="metric-label">Val Modularity</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentNMI">-</div>
+                        <div class="metric-label">NMI Score</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="validationNMI">-</div>
+                        <div class="metric-label">Val NMI</div>
                     </div>
                 </div>
-                <div id="trainingStatus" class="text-center">
-                    <i class="fas fa-clock fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">Ready to start training</p>
-                </div>
-            </div>
 
-            <!-- Live Metrics -->
-            <div class="progress-section">
-                <h4><i class="fas fa-tachometer-alt"></i> Live Metrics</h4>
+                <!-- Training Charts -->
                 <div class="row">
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h5 id="currentLoss">-</h5>
-                            <small class="text-muted">Training Loss</small>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="lossChart"></canvas>
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h5 id="currentModularity">-</h5>
-                            <small class="text-muted">Modularity</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h5 id="validationLoss">-</h5>
-                            <small class="text-muted">Validation Loss</small>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h5 id="validationModularity">-</h5>
-                            <small class="text-muted">Val Modularity</small>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="modularityChart"></canvas>
                         </div>
                     </div>
                 </div>
-                <div class="row mt-3">
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h5 id="currentNMI">-</h5>
-                            <small class="text-muted">NMI Score</small>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h5 id="validationNMI">-</h5>
-                            <small class="text-muted">Val NMI</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Training Charts -->
-            <div class="progress-section">
-                <h4><i class="fas fa-chart-area"></i> Training Curves</h4>
-                <div class="chart-container">
-                    <canvas id="lossChart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <canvas id="modularityChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="progress-section">
-                <h4><i class="fas fa-bolt"></i> Quick Actions</h4>
-                <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-outline-primary" id="saveModel">
-                        <i class="fas fa-save"></i> Save Model
-                    </button>
-                    <button type="button" class="btn btn-outline-success" id="viewResults">
-                        <i class="fas fa-chart-bar"></i> View Results
-                    </button>
-                    <button type="button" class="btn btn-outline-info" id="exportConfig">
-                        <i class="fas fa-download"></i> Export Config
-                    </button>
+                <!-- Quick Actions -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-outline-primary" id="saveModel">
+                                <i class="fas fa-save"></i> Save Model
+                            </button>
+                            <button type="button" class="btn btn-outline-success" id="viewResults">
+                                <i class="fas fa-chart-bar"></i> View Results
+                            </button>
+                            <button type="button" class="btn btn-outline-info" id="exportConfig">
+                                <i class="fas fa-download"></i> Export Config
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -518,18 +593,27 @@ document.addEventListener('DOMContentLoaded', function() {
             hidden_dim: parseInt(document.getElementById('hidden_dim').value),
             num_layers: parseInt(document.getElementById('num_layers').value),
             dropout: parseFloat(document.getElementById('dropout').value),
+            activation: document.getElementById('activation').value,
             learning_rate: parseFloat(document.getElementById('learning_rate').value),
             epochs: parseInt(document.getElementById('epochs').value),
             batch_size: parseInt(document.getElementById('batch_size').value),
             optimizer: document.getElementById('optimizer').value,
+            weight_decay: parseFloat(document.getElementById('weight_decay').value),
+            scheduler: document.getElementById('scheduler').value,
+            patience: parseInt(document.getElementById('patience').value),
+            loss_function: document.getElementById('loss_function').value,
             dataset: document.getElementById('dataset').value,
             validation_split: parseFloat(document.getElementById('validation_split').value),
             test_split: parseFloat(document.getElementById('test_split').value),
             num_communities: parseInt(document.getElementById('num_communities').value),
             community_detection_method: document.getElementById('community_detection_method').value,
+            embedding_dim: parseInt(document.getElementById('embedding_dim').value),
+            attention_heads: parseInt(document.getElementById('attention_heads').value),
             modularity_weight: parseFloat(document.getElementById('modularity_weight').value),
             regularization_weight: parseFloat(document.getElementById('regularization_weight').value),
-            resolution: parseFloat(document.getElementById('resolution').value)
+            resolution: parseFloat(document.getElementById('resolution').value),
+            min_community_size: parseInt(document.getElementById('min_community_size').value),
+            evaluation_metric: document.getElementById('evaluation_metric').value
         };
         
         // Start training simulation
@@ -555,8 +639,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update UI
         document.getElementById('startTraining').disabled = true;
         document.getElementById('stopTraining').disabled = false;
-        document.getElementById('trainingProgress').style.display = 'block';
-        document.getElementById('trainingStatus').style.display = 'none';
+        document.getElementById('liveMonitor').style.display = 'block';
         
         // Simulate training
         trainingInterval = setInterval(() => {
@@ -596,13 +679,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Check if training is complete
             if (currentEpoch >= totalEpochs) {
-                stopTraining();
-                showNotification('Training completed successfully!', 'success');
+                stopTraining(true); // true indicates natural completion
             }
         }, 100); // Update every 100ms for smooth animation
     }
     
-    function stopTraining() {
+    function stopTraining(isCompleted = false, isReset = false) {
         isTraining = false;
         clearInterval(trainingInterval);
         
@@ -610,11 +692,18 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('startTraining').disabled = false;
         document.getElementById('stopTraining').disabled = true;
         
-        showNotification('Training stopped', 'warning');
+        // Show appropriate notification
+        if (isReset) {
+            showNotification('Training reset', 'info');
+        } else if (isCompleted) {
+            showNotification('Training completed successfully!', 'success');
+        } else {
+            showNotification('Training stopped', 'warning');
+        }
     }
     
     function resetTraining() {
-        stopTraining();
+        stopTraining(false, true); // Pass isReset = true
         
         // Reset charts
         lossChart.data.labels = [];
@@ -630,8 +719,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Reset progress
         document.getElementById('epochProgress').style.width = '0%';
         document.getElementById('epochText').textContent = '0 / 0 epochs';
-        document.getElementById('trainingProgress').style.display = 'none';
-        document.getElementById('trainingStatus').style.display = 'block';
+        document.getElementById('liveMonitor').style.display = 'none';
         
         // Reset metrics
         document.getElementById('currentLoss').textContent = '-';
@@ -656,7 +744,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     document.getElementById('viewResults').addEventListener('click', function() {
-        window.location.href = `/purpose/${purpose_name}/results/${model_id}`;
+        window.location.href = `/purpose/{{ purpose_name }}/results/${model_id}`;
     });
     
     document.getElementById('exportConfig').addEventListener('click', function() {
@@ -667,18 +755,27 @@ document.addEventListener('DOMContentLoaded', function() {
                 hidden_dim: document.getElementById('hidden_dim').value,
                 num_layers: document.getElementById('num_layers').value,
                 dropout: document.getElementById('dropout').value,
+                activation: document.getElementById('activation').value,
                 learning_rate: document.getElementById('learning_rate').value,
                 epochs: document.getElementById('epochs').value,
                 batch_size: document.getElementById('batch_size').value,
                 optimizer: document.getElementById('optimizer').value,
+                weight_decay: document.getElementById('weight_decay').value,
+                scheduler: document.getElementById('scheduler').value,
+                patience: document.getElementById('patience').value,
+                loss_function: document.getElementById('loss_function').value,
                 dataset: document.getElementById('dataset').value,
                 validation_split: document.getElementById('validation_split').value,
                 test_split: document.getElementById('test_split').value,
                 num_communities: document.getElementById('num_communities').value,
                 community_detection_method: document.getElementById('community_detection_method').value,
+                embedding_dim: document.getElementById('embedding_dim').value,
+                attention_heads: document.getElementById('attention_heads').value,
                 modularity_weight: document.getElementById('modularity_weight').value,
                 regularization_weight: document.getElementById('regularization_weight').value,
-                resolution: document.getElementById('resolution').value
+                resolution: document.getElementById('resolution').value,
+                min_community_size: document.getElementById('min_community_size').value,
+                evaluation_metric: document.getElementById('evaluation_metric').value
             }
         };
         

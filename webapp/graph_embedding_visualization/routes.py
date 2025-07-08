@@ -147,6 +147,46 @@ async def get_embedding_analysis(experiment_id: str):
     }
     return JSONResponse(content=analysis_data)
 
+async def get_experiment_results(experiment_id: str):
+    """Get experiment results for graph embedding visualization."""
+    # Mock results data
+    results_data = {
+        'experiment_id': experiment_id,
+        'task_name': 'Graph Embedding Visualization',
+        'model_name': 'Node2Vec',
+        'dataset_name': 'Cora',
+        'timestamp': datetime.now().isoformat(),
+        'metrics': {
+            'embedding_dim': 64,
+            'num_nodes': 2708,
+            'visualization_method': 't-SNE',
+            'clustering_score': 0.78,
+            'silhouette_score': 0.65,
+            'reconstruction_loss': 0.12,
+            'link_prediction_auc': 0.85
+        },
+        'embeddings': np.random.randn(2708, 64).tolist(),
+        'labels': np.random.randint(0, 7, 2708).tolist(),
+        'node_ids': list(range(2708)),
+        'embedding_2d': np.random.randn(2708, 2).tolist(),
+        'visualization_data': {
+            'tsne': np.random.randn(2708, 2).tolist(),
+            'umap': np.random.randn(2708, 2).tolist(),
+            'pca': np.random.randn(2708, 2).tolist()
+        },
+        'clustering_results': {
+            'kmeans': {
+                'labels': np.random.randint(0, 5, 2708).tolist(),
+                'score': 0.78
+            },
+            'dbscan': {
+                'labels': np.random.randint(0, 6, 2708).tolist(),
+                'score': 0.72
+            }
+        }
+    }
+    return results_data
+
 @router.post("/api/start_embedding")
 async def start_embedding(request: Request):
     """Start embedding generation process."""

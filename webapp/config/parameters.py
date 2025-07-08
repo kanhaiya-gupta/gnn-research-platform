@@ -13,7 +13,7 @@ from .parameters.graph_regression import GRAPH_REGRESSION_PARAMETERS, DEFAULT_GR
 from .parameters.community_detection import COMMUNITY_DETECTION_PARAMETERS, DEFAULT_COMMUNITY_DETECTION_PARAMS
 from .parameters.anomaly_detection import ANOMALY_DETECTION_PARAMETERS, DEFAULT_ANOMALY_DETECTION_PARAMS
 from .parameters.graph_generation import GRAPH_GENERATION_PARAMETERS, DEFAULT_GRAPH_GENERATION_PARAMS
-from .parameters.graph_embedding import GRAPH_EMBEDDING_PARAMETERS, DEFAULT_GRAPH_EMBEDDING_PARAMS
+from .parameters.graph_embedding_visualization import GRAPH_EMBEDDING_VISUALIZATION_PARAMETERS, DEFAULT_GRAPH_EMBEDDING_VISUALIZATION_PARAMS
 from .parameters.dynamic_graph_learning import DYNAMIC_GRAPH_LEARNING_PARAMETERS, DEFAULT_DYNAMIC_GRAPH_LEARNING_PARAMS
 
 # Parameter registry for all tasks
@@ -27,7 +27,7 @@ PARAMETER_REGISTRY = {
     'community_detection': COMMUNITY_DETECTION_PARAMETERS,
     'anomaly_detection': ANOMALY_DETECTION_PARAMETERS,
     'graph_generation': GRAPH_GENERATION_PARAMETERS,
-    'graph_embedding': GRAPH_EMBEDDING_PARAMETERS,
+    'graph_embedding_visualization': GRAPH_EMBEDDING_VISUALIZATION_PARAMETERS,
     'dynamic_graph_learning': DYNAMIC_GRAPH_LEARNING_PARAMETERS
 }
 
@@ -42,7 +42,7 @@ DEFAULT_PARAMETERS_REGISTRY = {
     'community_detection': DEFAULT_COMMUNITY_DETECTION_PARAMS,
     'anomaly_detection': DEFAULT_ANOMALY_DETECTION_PARAMS,
     'graph_generation': DEFAULT_GRAPH_GENERATION_PARAMS,
-    'graph_embedding': DEFAULT_GRAPH_EMBEDDING_PARAMS,
+    'graph_embedding_visualization': DEFAULT_GRAPH_EMBEDDING_VISUALIZATION_PARAMS,
     'dynamic_graph_learning': DEFAULT_DYNAMIC_GRAPH_LEARNING_PARAMS
 }
 

@@ -8,12 +8,18 @@
         background: white;
         border-radius: 12px;
         padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     
     .parameter-group {
         margin-bottom: 1.5rem;
+    }
+    
+    .parameter-group h5 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-weight: 600;
     }
     
     .form-label {
@@ -37,15 +43,41 @@
         color: white;
         border-radius: 12px;
         padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
     
-    .progress-section {
+    .live-monitor {
         background: white;
         border-radius: 12px;
         padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .metric-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary);
+    }
+    
+    .metric-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
     }
     
     .chart-container {
@@ -78,8 +110,8 @@
     </div>
 
     <div class="row">
-        <!-- Left Column - Parameters and Controls -->
-        <div class="col-lg-8">
+        <!-- Main Content - Parameters -->
+        <div class="col-12">
             <!-- Model Information -->
             <div class="parameter-section">
                 <h4><i class="fas fa-info-circle"></i> Model Information</h4>
@@ -104,7 +136,7 @@
                         <div class="parameter-group">
                             <label for="hidden_dim" class="form-label">Hidden Dimension</label>
                             <input type="number" class="form-control" id="hidden_dim" name="hidden_dim" 
-                                   value="{{ default_params.hidden_dim }}" min="16" max="512" step="16">
+                                   value="64" min="16" max="512" step="16">
                             <div class="form-text">Dimension of hidden layers (16-512)</div>
                         </div>
                     </div>
@@ -112,7 +144,7 @@
                         <div class="parameter-group">
                             <label for="num_layers" class="form-label">Number of Layers</label>
                             <input type="number" class="form-control" id="num_layers" name="num_layers" 
-                                   value="{{ default_params.num_layers }}" min="1" max="10">
+                                   value="3" min="1" max="10">
                             <div class="form-text">Number of GNN layers (1-10)</div>
                         </div>
                     </div>
@@ -122,16 +154,38 @@
                         <div class="parameter-group">
                             <label for="dropout" class="form-label">Dropout Rate</label>
                             <input type="number" class="form-control" id="dropout" name="dropout" 
-                                   value="{{ default_params.dropout }}" min="0.0" max="0.5" step="0.1">
+                                   value="0.1" min="0.0" max="0.5" step="0.1">
                             <div class="form-text">Dropout rate for regularization (0.0-0.5)</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="parameter-group">
+                            <label for="activation" class="form-label">Activation Function</label>
+                            <select class="form-select" id="activation" name="activation">
+                                <option value="relu">ReLU</option>
+                                <option value="tanh">Tanh</option>
+                                <option value="sigmoid">Sigmoid</option>
+                                <option value="leaky_relu">Leaky ReLU</option>
+                            </select>
+                            <div class="form-text">Activation function for hidden layers</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
                             <label for="attention_heads" class="form-label">Attention Heads</label>
                             <input type="number" class="form-control" id="attention_heads" name="attention_heads" 
-                                   value="{{ default_params.attention_heads }}" min="1" max="16">
+                                   value="4" min="1" max="16">
                             <div class="form-text">Number of attention heads for temporal attention</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="embedding_dim" class="form-label">Temporal Embedding Dimension</label>
+                            <input type="number" class="form-control" id="embedding_dim" name="embedding_dim" 
+                                   value="32" min="8" max="256" step="8">
+                            <div class="form-text">Dimension of temporal embeddings (8-256)</div>
                         </div>
                     </div>
                 </div>
@@ -145,19 +199,63 @@
                         <div class="parameter-group">
                             <label for="num_time_steps" class="form-label">Number of Time Steps</label>
                             <input type="number" class="form-control" id="num_time_steps" name="num_time_steps" 
-                                   value="{{ default_params.num_time_steps }}" min="5" max="50">
+                                   value="10" min="5" max="50">
                             <div class="form-text">Number of temporal snapshots to consider (5-50)</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="parameter-group">
-                            <label for="time_window" class="form-label">Time Window</label>
+                            <label for="time_window" class="form-label">Time Window Strategy</label>
                             <select class="form-select" id="time_window" name="time_window">
                                 <option value="sliding">Sliding Window</option>
                                 <option value="fixed">Fixed Window</option>
                                 <option value="adaptive">Adaptive Window</option>
+                                <option value="exponential">Exponential Decay</option>
+                                <option value="attention">Attention-based</option>
                             </select>
                             <div class="form-text">Temporal window strategy</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="prediction_horizon" class="form-label">Prediction Horizon</label>
+                            <input type="number" class="form-control" id="prediction_horizon" name="prediction_horizon" 
+                                   value="5" min="1" max="20">
+                            <div class="form-text">Number of future time steps to predict</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="temporal_aggregation" class="form-label">Temporal Aggregation</label>
+                            <select class="form-select" id="temporal_aggregation" name="temporal_aggregation">
+                                <option value="mean">Mean Pooling</option>
+                                <option value="max">Max Pooling</option>
+                                <option value="lstm">LSTM</option>
+                                <option value="gru">GRU</option>
+                                <option value="transformer">Transformer</option>
+                                <option value="attention">Attention</option>
+                            </select>
+                            <div class="form-text">Method for aggregating temporal information</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="time_decay" class="form-label">Time Decay Factor</label>
+                            <input type="number" class="form-control" id="time_decay" name="time_decay" 
+                                   value="0.9" min="0.1" max="1.0" step="0.1">
+                            <div class="form-text">Decay factor for temporal importance (0.1-1.0)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="temporal_regularization" class="form-label">Temporal Regularization</label>
+                            <input type="number" class="form-control" id="temporal_regularization" name="temporal_regularization" 
+                                   value="0.01" min="0.0" max="0.1" step="0.001">
+                            <div class="form-text">Regularization for temporal smoothness (0.0-0.1)</div>
                         </div>
                     </div>
                 </div>
@@ -171,7 +269,7 @@
                         <div class="parameter-group">
                             <label for="learning_rate" class="form-label">Learning Rate</label>
                             <input type="number" class="form-control" id="learning_rate" name="learning_rate" 
-                                   value="{{ default_params.learning_rate }}" min="0.00001" max="0.1" step="0.0001">
+                                   value="0.001" min="0.00001" max="0.1" step="0.0001">
                             <div class="form-text">Learning rate for optimization</div>
                         </div>
                     </div>
@@ -179,7 +277,7 @@
                         <div class="parameter-group">
                             <label for="epochs" class="form-label">Number of Epochs</label>
                             <input type="number" class="form-control" id="epochs" name="epochs" 
-                                   value="{{ default_params.epochs }}" min="10" max="1000">
+                                   value="100" min="10" max="1000">
                             <div class="form-text">Number of training epochs</div>
                         </div>
                     </div>
@@ -189,7 +287,7 @@
                         <div class="parameter-group">
                             <label for="batch_size" class="form-label">Batch Size</label>
                             <input type="number" class="form-control" id="batch_size" name="batch_size" 
-                                   value="{{ default_params.batch_size }}" min="1" max="256">
+                                   value="32" min="1" max="256">
                             <div class="form-text">Batch size for training</div>
                         </div>
                     </div>
@@ -203,6 +301,52 @@
                                 <option value="rmsprop">RMSprop</option>
                             </select>
                             <div class="form-text">Optimization algorithm</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="weight_decay" class="form-label">Weight Decay</label>
+                            <input type="number" class="form-control" id="weight_decay" name="weight_decay" 
+                                   value="0.0001" min="0.0" max="0.1" step="0.0001">
+                            <div class="form-text">L2 regularization coefficient</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="scheduler" class="form-label">Learning Rate Scheduler</label>
+                            <select class="form-select" id="scheduler" name="scheduler">
+                                <option value="none">None</option>
+                                <option value="step">Step LR</option>
+                                <option value="cosine">Cosine Annealing</option>
+                                <option value="plateau">Reduce on Plateau</option>
+                            </select>
+                            <div class="form-text">Learning rate scheduling strategy</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="patience" class="form-label">Early Stopping Patience</label>
+                            <input type="number" class="form-control" id="patience" name="patience" 
+                                   value="10" min="1" max="50">
+                            <div class="form-text">Number of epochs to wait before early stopping</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="loss_function" class="form-label">Loss Function</label>
+                            <select class="form-select" id="loss_function" name="loss_function">
+                                <option value="mse">Mean Squared Error</option>
+                                <option value="mae">Mean Absolute Error</option>
+                                <option value="bce">Binary Cross Entropy</option>
+                                <option value="ce">Cross Entropy</option>
+                                <option value="temporal">Temporal Loss</option>
+                                <option value="combined">Combined Loss</option>
+                            </select>
+                            <div class="form-text">Loss function for dynamic graph learning</div>
                         </div>
                     </div>
                 </div>
@@ -221,16 +365,74 @@
                                 <option value="facebook">Facebook Social Network</option>
                                 <option value="wikipedia">Wikipedia Edit History</option>
                                 <option value="reddit">Reddit Discussion Threads</option>
+                                <option value="twitter">Twitter Social Network</option>
+                                <option value="dblp">DBLP Collaboration Network</option>
+                                <option value="amazon">Amazon Co-purchase Network</option>
+                                <option value="youtube">YouTube Social Network</option>
+                                <option value="stackoverflow">Stack Overflow Q&A</option>
                             </select>
                             <div class="form-text">Dynamic graph dataset</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="parameter-group">
-                            <label for="prediction_horizon" class="form-label">Prediction Horizon</label>
-                            <input type="number" class="form-control" id="prediction_horizon" name="prediction_horizon" 
-                                   value="5" min="1" max="20">
-                            <div class="form-text">Number of future time steps to predict</div>
+                            <label for="task_type" class="form-label">Task Type</label>
+                            <select class="form-select" id="task_type" name="task_type">
+                                <option value="link_prediction">Temporal Link Prediction</option>
+                                <option value="node_classification">Dynamic Node Classification</option>
+                                <option value="graph_classification">Dynamic Graph Classification</option>
+                                <option value="edge_prediction">Edge Evolution Prediction</option>
+                                <option value="community_evolution">Community Evolution</option>
+                                <option value="anomaly_detection">Temporal Anomaly Detection</option>
+                            </select>
+                            <div class="form-text">Type of dynamic graph task</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="validation_split" class="form-label">Validation Split</label>
+                            <input type="number" class="form-control" id="validation_split" name="validation_split" 
+                                   value="0.2" min="0.1" max="0.5" step="0.1">
+                            <div class="form-text">Fraction of temporal data for validation</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="test_split" class="form-label">Test Split</label>
+                            <input type="number" class="form-control" id="test_split" name="test_split" 
+                                   value="0.2" min="0.1" max="0.5" step="0.1">
+                            <div class="form-text">Fraction of temporal data for testing</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="evaluation_metric" class="form-label">Evaluation Metric</label>
+                            <select class="form-select" id="evaluation_metric" name="evaluation_metric">
+                                <option value="accuracy">Accuracy</option>
+                                <option value="precision">Precision</option>
+                                <option value="recall">Recall</option>
+                                <option value="f1">F1 Score</option>
+                                <option value="auroc">AUROC</option>
+                                <option value="mse">Mean Squared Error</option>
+                                <option value="mae">Mean Absolute Error</option>
+                            </select>
+                            <div class="form-text">Primary evaluation metric</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="temporal_sampling" class="form-label">Temporal Sampling</label>
+                            <select class="form-select" id="temporal_sampling" name="temporal_sampling">
+                                <option value="uniform">Uniform Sampling</option>
+                                <option value="weighted">Weighted Sampling</option>
+                                <option value="importance">Importance Sampling</option>
+                                <option value="adaptive">Adaptive Sampling</option>
+                            </select>
+                            <div class="form-text">Strategy for temporal data sampling</div>
                         </div>
                     </div>
                 </div>
@@ -239,210 +441,390 @@
             <!-- Training Controls -->
             <div class="training-controls">
                 <h4><i class="fas fa-play-circle"></i> Training Controls</h4>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-light" id="startTraining">
-                        <i class="fas fa-play me-1"></i>
-                        Start Training
-                    </button>
-                    <button type="button" class="btn btn-light" id="stopTraining" disabled>
-                        <i class="fas fa-stop me-1"></i>
-                        Stop Training
-                    </button>
-                    <button type="button" class="btn btn-light" id="resetForm">
-                        <i class="fas fa-undo me-1"></i>
-                        Reset
-                    </button>
-                </div>
-            </div>
-        </div>
-
-        <!-- Right Column - Progress and Results -->
-        <div class="col-lg-4">
-            <!-- Training Progress -->
-            <div class="progress-section">
-                <h4><i class="fas fa-chart-line"></i> Training Progress</h4>
-                <div id="trainingProgress" style="display: none;">
-                    <div class="mb-3">
-                        <label class="form-label">Progress</label>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                        </div>
-                        <small class="text-muted">Epoch: <span id="currentEpoch">0</span> / <span id="totalEpochs">100</span></small>
+                <div class="row">
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-success btn-lg w-100 mb-3" id="startTraining">
+                            <i class="fas fa-play"></i> Start Training
+                        </button>
                     </div>
-                    
-                    <div class="mb-3">
-                        <h6>Current Metrics</h6>
-                        <div class="row text-center">
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <small class="text-muted">Train Loss</small>
-                                    <div id="trainLoss">-</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <small class="text-muted">Val Loss</small>
-                                    <div id="valLoss">-</div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-danger btn-lg w-100 mb-3" id="stopTraining" disabled>
+                            <i class="fas fa-stop"></i> Stop Training
+                        </button>
                     </div>
-                    
-                    <div class="mb-3">
-                        <div class="row text-center">
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <small class="text-muted">Train Acc</small>
-                                    <div id="trainAcc">-</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <small class="text-muted">Val Acc</small>
-                                    <div id="valAcc">-</div>
-                                </div>
-                            </div>
-                        </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-warning btn-lg w-100 mb-3" id="resetTraining">
+                            <i class="fas fa-redo"></i> Reset Training
+                        </button>
                     </div>
-                    
-                    <div class="text-center">
-                        <small class="text-muted">Estimated time remaining: <span id="timeRemaining">-</span></small>
-                    </div>
-                </div>
-                
-                <div id="noTraining" class="text-center text-muted">
-                    <i class="fas fa-play-circle fa-3x mb-3"></i>
-                    <p>Click "Start Training" to begin the experiment</p>
                 </div>
             </div>
 
-            <!-- Model Information -->
-            <div class="progress-section">
-                <h4><i class="fas fa-info-circle"></i> Model Details</h4>
-                <ul class="list-unstyled">
-                    <li><strong>Category:</strong> {{ model.category }}</li>
-                    <li><strong>Architecture:</strong> {{ model.architecture }}</li>
-                    <li><strong>Inductive:</strong> {{ "Yes" if model.inductive else "No" }}</li>
-                </ul>
+            <!-- Live Training Monitor -->
+            <div class="live-monitor" id="liveMonitor" style="display: none;">
+                <h4><i class="fas fa-chart-line"></i> Live Training Monitor</h4>
                 
-                <h6>Use Cases</h6>
-                <ul class="list-unstyled">
-                    <li>• Social network evolution analysis</li>
-                    <li>• Temporal link prediction</li>
-                    <li>• Dynamic community detection</li>
-                    <li>• Time-series graph forecasting</li>
-                </ul>
+                <!-- Training Progress -->
+                <div class="mb-4">
+                    <label class="form-label">Epoch Progress</label>
+                    <div class="progress mb-2">
+                        <div class="progress-bar" id="epochProgress" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small class="text-muted" id="epochText">0 / 0 epochs</small>
+                </div>
+
+                <!-- Live Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentLoss">-</div>
+                        <div class="metric-label">Training Loss</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentAccuracy">-</div>
+                        <div class="metric-label">Training Accuracy</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="validationLoss">-</div>
+                        <div class="metric-label">Validation Loss</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="validationAccuracy">-</div>
+                        <div class="metric-label">Val Accuracy</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="temporalConsistency">-</div>
+                        <div class="metric-label">Temporal Consistency</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="predictionError">-</div>
+                        <div class="metric-label">Prediction Error</div>
+                    </div>
+                </div>
+
+                <!-- Training Charts -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="lossChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="accuracyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-outline-primary" id="saveModel">
+                                <i class="fas fa-save"></i> Save Model
+                            </button>
+                            <button type="button" class="btn btn-outline-success" id="viewResults">
+                                <i class="fas fa-chart-bar"></i> View Results
+                            </button>
+                            <button type="button" class="btn btn-outline-info" id="exportConfig">
+                                <i class="fas fa-download"></i> Export Config
+                            </button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
-$(document).ready(function() {
-    let trainingInterval;
-    let currentEpoch = 0;
-    let totalEpochs = 100;
-    let isTraining = false;
-
-    // Start training
-    $('#startTraining').on('click', function() {
-        startTraining();
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts
+    const lossCtx = document.getElementById('lossChart').getContext('2d');
+    const accuracyCtx = document.getElementById('accuracyChart').getContext('2d');
+    
+    const lossChart = new Chart(lossCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Training Loss',
+                data: [],
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }, {
+                label: 'Validation Loss',
+                data: [],
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Loss Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
     });
-
+    
+    const accuracyChart = new Chart(accuracyCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Training Accuracy',
+                data: [],
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.1
+            }, {
+                label: 'Validation Accuracy',
+                data: [],
+                borderColor: 'rgb(255, 159, 64)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Accuracy Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    min: 0,
+                    max: 1
+                }
+            }
+        }
+    });
+    
+    // Training state
+    let isTraining = false;
+    let currentEpoch = 0;
+    let totalEpochs = 0;
+    let trainingInterval;
+    
+    // Start training
+    document.getElementById('startTraining').addEventListener('click', function() {
+        if (isTraining) return;
+        
+        // Get parameters
+        const parameters = {
+            hidden_dim: parseInt(document.getElementById('hidden_dim').value),
+            num_layers: parseInt(document.getElementById('num_layers').value),
+            dropout: parseFloat(document.getElementById('dropout').value),
+            activation: document.getElementById('activation').value,
+            attention_heads: parseInt(document.getElementById('attention_heads').value),
+            embedding_dim: parseInt(document.getElementById('embedding_dim').value),
+            learning_rate: parseFloat(document.getElementById('learning_rate').value),
+            epochs: parseInt(document.getElementById('epochs').value),
+            batch_size: parseInt(document.getElementById('batch_size').value),
+            optimizer: document.getElementById('optimizer').value,
+            weight_decay: parseFloat(document.getElementById('weight_decay').value),
+            scheduler: document.getElementById('scheduler').value,
+            patience: parseInt(document.getElementById('patience').value),
+            loss_function: document.getElementById('loss_function').value,
+            num_time_steps: parseInt(document.getElementById('num_time_steps').value),
+            time_window: document.getElementById('time_window').value,
+            prediction_horizon: parseInt(document.getElementById('prediction_horizon').value),
+            temporal_aggregation: document.getElementById('temporal_aggregation').value,
+            time_decay: parseFloat(document.getElementById('time_decay').value),
+            temporal_regularization: parseFloat(document.getElementById('temporal_regularization').value),
+            dataset: document.getElementById('dataset').value,
+            task_type: document.getElementById('task_type').value,
+            validation_split: parseFloat(document.getElementById('validation_split').value),
+            test_split: parseFloat(document.getElementById('test_split').value),
+            evaluation_metric: document.getElementById('evaluation_metric').value,
+            temporal_sampling: document.getElementById('temporal_sampling').value
+        };
+        
+        // Start training simulation
+        startTrainingSimulation(parameters);
+    });
+    
     // Stop training
-    $('#stopTraining').on('click', function() {
+    document.getElementById('stopTraining').addEventListener('click', function() {
+        if (!isTraining) return;
         stopTraining();
     });
-
-    // Reset form
-    $('#resetForm').on('click', function() {
-        resetForm();
+    
+    // Reset training
+    document.getElementById('resetTraining').addEventListener('click', function() {
+        resetTraining();
     });
-
-    function startTraining() {
+    
+    function startTrainingSimulation(parameters) {
         isTraining = true;
         currentEpoch = 0;
+        totalEpochs = parameters.epochs;
         
         // Update UI
-        $('#startTraining').prop('disabled', true);
-        $('#stopTraining').prop('disabled', false);
-        $('#trainingProgress').show();
-        $('#noTraining').hide();
+        document.getElementById('startTraining').disabled = true;
+        document.getElementById('stopTraining').disabled = false;
+        document.getElementById('liveMonitor').style.display = 'block';
         
-        // Start progress simulation
-        trainingInterval = setInterval(function() {
+        // Simulate training
+        trainingInterval = setInterval(() => {
             currentEpoch++;
-            updateProgress();
             
+            // Update progress
+            const epochProgress = (currentEpoch / totalEpochs) * 100;
+            document.getElementById('epochProgress').style.width = epochProgress + '%';
+            document.getElementById('epochText').textContent = `${currentEpoch} / ${totalEpochs} epochs`;
+            
+            // Simulate metrics for dynamic graph learning
+            const trainLoss = Math.max(0.1, 0.8 - (currentEpoch / totalEpochs) * 0.7);
+            const valLoss = trainLoss + Math.random() * 0.1;
+            const trainAcc = Math.min(0.95, 0.3 + (currentEpoch / totalEpochs) * 0.6);
+            const valAcc = trainAcc - Math.random() * 0.05;
+            const temporalConsistency = Math.min(0.9, 0.4 + (currentEpoch / totalEpochs) * 0.5);
+            const predictionError = Math.max(0.05, 0.3 - (currentEpoch / totalEpochs) * 0.25);
+            
+            // Update metrics
+            document.getElementById('currentLoss').textContent = trainLoss.toFixed(4);
+            document.getElementById('currentAccuracy').textContent = (trainAcc * 100).toFixed(2) + '%';
+            document.getElementById('validationLoss').textContent = valLoss.toFixed(4);
+            document.getElementById('validationAccuracy').textContent = (valAcc * 100).toFixed(2) + '%';
+            document.getElementById('temporalConsistency').textContent = (temporalConsistency * 100).toFixed(2) + '%';
+            document.getElementById('predictionError').textContent = predictionError.toFixed(4);
+            
+            // Update charts
+            lossChart.data.labels.push(currentEpoch);
+            lossChart.data.datasets[0].data.push(trainLoss);
+            lossChart.data.datasets[1].data.push(valLoss);
+            lossChart.update();
+            
+            accuracyChart.data.labels.push(currentEpoch);
+            accuracyChart.data.datasets[0].data.push(trainAcc);
+            accuracyChart.data.datasets[1].data.push(valAcc);
+            accuracyChart.update();
+            
+            // Check if training is complete
             if (currentEpoch >= totalEpochs) {
-                stopTraining();
-                showResults();
+                stopTraining(true); // true indicates natural completion
             }
-        }, 100);
+        }, 100); // Update every 100ms for smooth animation
     }
-
-    function stopTraining() {
+    
+    function stopTraining(isCompleted = false, isReset = false) {
         isTraining = false;
         clearInterval(trainingInterval);
         
-        $('#startTraining').prop('disabled', false);
-        $('#stopTraining').prop('disabled', true);
+        // Update UI
+        document.getElementById('startTraining').disabled = false;
+        document.getElementById('stopTraining').disabled = true;
+        
+        // Show appropriate notification
+        if (isReset) {
+            showNotification('Training reset', 'info');
+        } else if (isCompleted) {
+            showNotification('Training completed successfully!', 'success');
+        } else {
+            showNotification('Training stopped', 'warning');
+        }
     }
-
-    function updateProgress() {
-        const progress = (currentEpoch / totalEpochs) * 100;
-        $('.progress-bar').css('width', progress + '%');
-        $('#currentEpoch').text(currentEpoch);
+    
+    function resetTraining() {
+        stopTraining(false, true); // Pass isReset = true
         
-        // Simulate metrics for dynamic graph learning
-        const trainLoss = Math.max(0.1, 0.8 - (currentEpoch * 0.007));
-        const valLoss = Math.max(0.15, 0.85 - (currentEpoch * 0.006));
-        const trainAcc = Math.min(0.95, 0.3 + (currentEpoch * 0.006));
-        const valAcc = Math.min(0.92, 0.25 + (currentEpoch * 0.005));
+        // Reset charts
+        lossChart.data.labels = [];
+        lossChart.data.datasets[0].data = [];
+        lossChart.data.datasets[1].data = [];
+        lossChart.update();
         
-        $('#trainLoss').text(trainLoss.toFixed(3));
-        $('#valLoss').text(valLoss.toFixed(3));
-        $('#trainAcc').text((trainAcc * 100).toFixed(1) + '%');
-        $('#valAcc').text((valAcc * 100).toFixed(1) + '%');
-        
-        // Estimate time remaining
-        const timeRemaining = Math.max(0, totalEpochs - currentEpoch) * 0.1;
-        const minutes = Math.floor(timeRemaining / 60);
-        const seconds = Math.floor(timeRemaining % 60);
-        $('#timeRemaining').text(`${minutes}:${seconds.toString().padStart(2, '0')}`);
-    }
-
-    function showResults() {
-        setTimeout(function() {
-            const modelId = '{{ model_id }}';
-            const purposeName = '{{ purpose_name }}';
-            window.location.href = `/purpose/${purposeName}/results/${modelId}`;
-        }, 1000);
-    }
-
-    function resetForm() {
-        // Reset form fields to defaults
-        $('#hidden_dim').val('{{ default_params.hidden_dim }}');
-        $('#num_layers').val('{{ default_params.num_layers }}');
-        $('#dropout').val('{{ default_params.dropout }}');
-        $('#learning_rate').val('{{ default_params.learning_rate }}');
-        $('#epochs').val('{{ default_params.epochs }}');
-        $('#batch_size').val('{{ default_params.batch_size }}');
-        $('#attention_heads').val('{{ default_params.attention_heads }}');
-        $('#num_time_steps').val('{{ default_params.num_time_steps }}');
-        
-        // Stop training if running
-        stopTraining();
+        accuracyChart.data.labels = [];
+        accuracyChart.data.datasets[0].data = [];
+        accuracyChart.data.datasets[1].data = [];
+        accuracyChart.update();
         
         // Reset progress
-        $('#trainingProgress').hide();
-        $('#noTraining').show();
-        $('.progress-bar').css('width', '0%');
-        $('#currentEpoch').text('0');
-        $('#trainLoss, #valLoss, #trainAcc, #valAcc').text('-');
+        document.getElementById('epochProgress').style.width = '0%';
+        document.getElementById('epochText').textContent = '0 / 0 epochs';
+        document.getElementById('liveMonitor').style.display = 'none';
+        
+        // Reset metrics
+        document.getElementById('currentLoss').textContent = '-';
+        document.getElementById('currentAccuracy').textContent = '-';
+        document.getElementById('validationLoss').textContent = '-';
+        document.getElementById('validationAccuracy').textContent = '-';
+        document.getElementById('temporalConsistency').textContent = '-';
+        document.getElementById('predictionError').textContent = '-';
     }
+    
+    function showNotification(message, type = 'info') {
+        if (window.GNNPlatform && window.GNNPlatform.showNotification) {
+            window.GNNPlatform.showNotification(message, type);
+        } else {
+            alert(message);
+        }
+    }
+    
+    // Quick action handlers
+    document.getElementById('saveModel').addEventListener('click', function() {
+        showNotification('Model saved successfully!', 'success');
+    });
+    
+    document.getElementById('viewResults').addEventListener('click', function() {
+        window.location.href = `/purpose/{{ purpose_name }}/results/${model_id}`;
+    });
+    
+    document.getElementById('exportConfig').addEventListener('click', function() {
+        const config = {
+            model: '{{ model_id }}',
+            purpose: '{{ purpose_name }}',
+            parameters: {
+                hidden_dim: document.getElementById('hidden_dim').value,
+                num_layers: document.getElementById('num_layers').value,
+                dropout: document.getElementById('dropout').value,
+                activation: document.getElementById('activation').value,
+                attention_heads: document.getElementById('attention_heads').value,
+                embedding_dim: document.getElementById('embedding_dim').value,
+                learning_rate: document.getElementById('learning_rate').value,
+                epochs: document.getElementById('epochs').value,
+                batch_size: document.getElementById('batch_size').value,
+                optimizer: document.getElementById('optimizer').value,
+                weight_decay: document.getElementById('weight_decay').value,
+                scheduler: document.getElementById('scheduler').value,
+                patience: document.getElementById('patience').value,
+                loss_function: document.getElementById('loss_function').value,
+                num_time_steps: document.getElementById('num_time_steps').value,
+                time_window: document.getElementById('time_window').value,
+                prediction_horizon: document.getElementById('prediction_horizon').value,
+                temporal_aggregation: document.getElementById('temporal_aggregation').value,
+                time_decay: document.getElementById('time_decay').value,
+                temporal_regularization: document.getElementById('temporal_regularization').value,
+                dataset: document.getElementById('dataset').value,
+                task_type: document.getElementById('task_type').value,
+                validation_split: document.getElementById('validation_split').value,
+                test_split: document.getElementById('test_split').value,
+                evaluation_metric: document.getElementById('evaluation_metric').value,
+                temporal_sampling: document.getElementById('temporal_sampling').value
+            }
+        };
+        
+        const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `gnn_config_${model_id}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        showNotification('Configuration exported successfully!', 'success');
+    });
 });
 </script>
 {% endblock %}

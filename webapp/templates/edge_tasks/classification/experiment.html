@@ -2,243 +2,400 @@
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extra_head %}
+<style>
+    .parameter-section {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .parameter-group {
+        margin-bottom: 1.5rem;
+    }
+    
+    .parameter-group h5 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
+    .form-label {
+        font-weight: 500;
+        color: var(--dark);
+    }
+    
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 2px solid #e9ecef;
+        transition: border-color 0.3s ease;
+    }
+    
+    .form-control:focus, .form-select:focus {
+        border-color: var(--primary);
+        box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+    }
+    
+    .training-controls {
+        background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
+        color: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .live-monitor {
+        background: white;
+        border-radius: 12px;
+        padding: 2rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .metric-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary);
+    }
+    
+    .metric-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
+    }
+    
+    .chart-container {
+        height: 300px;
+        margin-bottom: 1rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
 <div class="container-fluid">
-    <!-- Header Section -->
+    <!-- Header -->
     <div class="row mb-4">
         <div class="col-12">
-            <div class="card bg-success text-white">
-                <div class="card-body">
-                    <div class="d-flex align-items-center">
-                        <div class="flex-shrink-0">
-                            <i class="fas fa-random fa-3x"></i>
-                        </div>
-                        <div class="flex-grow-1 ms-3">
-                            <h1 class="card-title mb-1">{{ purpose.name }} - {{ model.name }}</h1>
-                            <p class="card-text mb-0">{{ purpose.description }}</p>
-                        </div>
-                    </div>
+            <div class="d-flex justify-content-between align-items-center">
+                <div>
+                    <h1 class="h3 mb-0">
+                        <i class="fas fa-flask"></i>
+                        {{ model.name }} Experiment
+                    </h1>
+                    <p class="text-muted mb-0">{{ purpose.name }} - {{ purpose.description }}</p>
+                </div>
+                <div>
+                    <a href="/purpose/{{ purpose_name }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left"></i> Back to {{ purpose.name }}
+                    </a>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Experiment Configuration -->
-    <div class="row mb-4">
-        <div class="col-md-8">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-cogs me-2"></i>
-                        Model Configuration
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <form id="experimentForm">
-                        <!-- Model Information -->
-                        <div class="mb-4">
-                            <h5>Model: {{ model.name }}</h5>
-                            <p class="text-muted">{{ model.description }}</p>
-                        </div>
-
-                        <!-- Parameters -->
-                        <div class="row">
-                            {% for param_id, param in parameters.items() %}
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ param_id }}" class="form-label">{{ param.name }}</label>
-                                {% if param.type == 'select' %}
-                                <select class="form-select" id="{{ param_id }}" name="{{ param_id }}">
-                                    {% for option in param.options %}
-                                    <option value="{{ option.value }}" {% if option.value == param.default %}selected{% endif %}>
-                                        {{ option.label }}
-                                    </option>
-                                    {% endfor %}
-                                </select>
-                                {% elif param.type == 'number' %}
-                                <input type="number" class="form-control" id="{{ param_id }}" name="{{ param_id }}"
-                                       value="{{ param.default }}" min="{{ param.min }}" max="{{ param.max }}" step="{{ param.step }}">
-                                {% elif param.type == 'boolean' %}
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="{{ param_id }}" name="{{ param_id }}"
-                                           {% if param.default %}checked{% endif %}>
-                                    <label class="form-check-label" for="{{ param_id }}">
-                                        {{ param.description }}
-                                    </label>
-                                </div>
-                                {% else %}
-                                <input type="text" class="form-control" id="{{ param_id }}" name="{{ param_id }}"
-                                       value="{{ param.default }}">
-                                {% endif %}
-                                <div class="form-text">{{ param.description }}</div>
-                            </div>
-                            {% endfor %}
-                        </div>
-
-                        <!-- Dataset Selection -->
-                        <div class="mb-4">
-                            <h5>Dataset</h5>
-                            <div class="row">
-                                <div class="col-md-6">
-                                    <label for="dataset" class="form-label">Select Dataset</label>
-                                    <select class="form-select" id="dataset" name="dataset">
-                                        <option value="cora">Cora (Citation Network)</option>
-                                        <option value="citeseer">CiteSeer (Citation Network)</option>
-                                        <option value="pubmed">PubMed (Biomedical)</option>
-                                        <option value="karate">Karate Club (Social Network)</option>
-                                    </select>
-                                </div>
-                                <div class="col-md-6">
-                                    <label for="split_ratio" class="form-label">Train/Test Split</label>
-                                    <input type="number" class="form-control" id="split_ratio" name="split_ratio"
-                                           value="0.8" min="0.1" max="0.9" step="0.1">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Training Configuration -->
-                        <div class="mb-4">
-                            <h5>Training Configuration</h5>
-                            <div class="row">
-                                <div class="col-md-3">
-                                    <label for="epochs" class="form-label">Epochs</label>
-                                    <input type="number" class="form-control" id="epochs" name="epochs"
-                                           value="100" min="1" max="1000">
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="learning_rate" class="form-label">Learning Rate</label>
-                                    <input type="number" class="form-control" id="learning_rate" name="learning_rate"
-                                           value="0.001" min="0.0001" max="0.1" step="0.0001">
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="batch_size" class="form-label">Batch Size</label>
-                                    <input type="number" class="form-control" id="batch_size" name="batch_size"
-                                           value="32" min="1" max="512">
-                                </div>
-                                <div class="col-md-3">
-                                    <label for="patience" class="form-label">Early Stopping Patience</label>
-                                    <input type="number" class="form-control" id="patience" name="patience"
-                                           value="10" min="1" max="50">
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Action Buttons -->
-                        <div class="d-flex gap-2">
-                            <button type="submit" class="btn btn-success" id="startTraining">
-                                <i class="fas fa-play me-1"></i>
-                                Start Training
-                            </button>
-                            <button type="button" class="btn btn-secondary" id="stopTraining" disabled>
-                                <i class="fas fa-stop me-1"></i>
-                                Stop Training
-                            </button>
-                            <button type="button" class="btn btn-outline-primary" id="resetForm">
-                                <i class="fas fa-undo me-1"></i>
-                                Reset
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-
-        <!-- Training Progress -->
-        <div class="col-md-4">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-chart-line me-2"></i>
-                        Training Progress
-                    </h3>
-                </div>
-                <div class="card-body">
-                    <div id="trainingProgress" style="display: none;">
-                        <div class="mb-3">
-                            <label class="form-label">Progress</label>
-                            <div class="progress">
-                                <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                            </div>
-                            <small class="text-muted">Epoch: <span id="currentEpoch">0</span> / <span id="totalEpochs">100</span></small>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <h6>Current Metrics</h6>
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <div class="border rounded p-2">
-                                        <small class="text-muted">Train Loss</small>
-                                        <div id="trainLoss">-</div>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="border rounded p-2">
-                                        <small class="text-muted">Val Loss</small>
-                                        <div id="valLoss">-</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="mb-3">
-                            <div class="row text-center">
-                                <div class="col-6">
-                                    <div class="border rounded p-2">
-                                        <small class="text-muted">Train Acc</small>
-                                        <div id="trainAcc">-</div>
-                                    </div>
-                                </div>
-                                <div class="col-6">
-                                    <div class="border rounded p-2">
-                                        <small class="text-muted">Val Acc</small>
-                                        <div id="valAcc">-</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        
-                        <div class="text-center">
-                            <small class="text-muted">Estimated time remaining: <span id="timeRemaining">-</span></small>
-                        </div>
-                    </div>
-                    
-                    <div id="noTraining" class="text-center text-muted">
-                        <i class="fas fa-play-circle fa-3x mb-3"></i>
-                        <p>Click "Start Training" to begin the experiment</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Model Information -->
-    <div class="row mb-4">
+    <div class="row">
+        <!-- Main Content - Parameters -->
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <h3 class="card-title mb-0">
-                        <i class="fas fa-info-circle me-2"></i>
-                        Model Information
-                    </h3>
+            <!-- Model Information -->
+            <div class="parameter-section">
+                <h4><i class="fas fa-info-circle"></i> Model Information</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Model:</strong> {{ model.name }}</p>
+                        <p><strong>Paper:</strong> {{ model.paper }}</p>
+                        <p><strong>Type:</strong> Edge Classification</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Formula:</strong> <code>{{ model.formula }}</code></p>
+                        <p><strong>Applications:</strong> {{ model.applications|join(', ') }}</p>
+                    </div>
                 </div>
-                <div class="card-body">
-                    <div class="row">
-                        <div class="col-md-6">
-                            <h5>Model Details</h5>
-                            <ul>
-                                <li><strong>Category:</strong> {{ model.category }}</li>
-                                <li><strong>Architecture:</strong> {{ model.architecture }}</li>
-                                <li><strong>Paper:</strong> <a href="{{ model.paper_url }}" target="_blank">{{ model.paper_title }}</a></li>
-                                <li><strong>Year:</strong> {{ model.year }}</li>
-                            </ul>
+            </div>
+
+            <!-- Architecture Parameters -->
+            <div class="parameter-section">
+                <h4><i class="fas fa-cogs"></i> Architecture Parameters</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="hidden_dim" class="form-label">Hidden Dimension</label>
+                            <input type="number" class="form-control" id="hidden_dim" name="hidden_dim" 
+                                   value="64" min="16" max="512" step="16">
+                            <div class="form-text">Dimension of hidden layers (16-512)</div>
                         </div>
-                        <div class="col-md-6">
-                            <h5>Use Cases</h5>
-                            <ul>
-                                <li>Edge type classification in social networks</li>
-                                <li>Relationship prediction in knowledge graphs</li>
-                                <li>Link type inference in biological networks</li>
-                                <li>Edge classification in recommendation systems</li>
-                            </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="num_layers" class="form-label">Number of Layers</label>
+                            <input type="number" class="form-control" id="num_layers" name="num_layers" 
+                                   value="3" min="1" max="10">
+                            <div class="form-text">Number of GNN layers (1-10)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="dropout" class="form-label">Dropout Rate</label>
+                            <input type="number" class="form-control" id="dropout" name="dropout" 
+                                   value="0.1" min="0.0" max="0.5" step="0.1">
+                            <div class="form-text">Dropout rate for regularization (0.0-0.5)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="activation" class="form-label">Activation Function</label>
+                            <select class="form-select" id="activation" name="activation">
+                                <option value="relu">ReLU</option>
+                                <option value="tanh">Tanh</option>
+                                <option value="sigmoid">Sigmoid</option>
+                                <option value="leaky_relu">Leaky ReLU</option>
+                            </select>
+                            <div class="form-text">Activation function for hidden layers</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="num_classes" class="form-label">Number of Classes</label>
+                            <input type="number" class="form-control" id="num_classes" name="num_classes" 
+                                   value="7" min="2" max="20" step="1">
+                            <div class="form-text">Number of edge classes to predict (2-20)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="edge_feature_dim" class="form-label">Edge Feature Dimension</label>
+                            <input type="number" class="form-control" id="edge_feature_dim" name="edge_feature_dim" 
+                                   value="16" min="1" max="128" step="1">
+                            <div class="form-text">Dimension of edge features (1-128)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training Parameters -->
+            <div class="parameter-section">
+                <h4><i class="fas fa-graduation-cap"></i> Training Parameters</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="learning_rate" class="form-label">Learning Rate</label>
+                            <input type="number" class="form-control" id="learning_rate" name="learning_rate" 
+                                   value="0.001" min="0.00001" max="0.1" step="0.0001">
+                            <div class="form-text">Learning rate for optimization</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="epochs" class="form-label">Number of Epochs</label>
+                            <input type="number" class="form-control" id="epochs" name="epochs" 
+                                   value="100" min="10" max="1000">
+                            <div class="form-text">Number of training epochs</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="batch_size" class="form-label">Batch Size</label>
+                            <input type="number" class="form-control" id="batch_size" name="batch_size" 
+                                   value="32" min="1" max="256">
+                            <div class="form-text">Batch size for training</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="optimizer" class="form-label">Optimizer</label>
+                            <select class="form-select" id="optimizer" name="optimizer">
+                                <option value="adam">Adam</option>
+                                <option value="sgd">SGD</option>
+                                <option value="adamw">AdamW</option>
+                                <option value="rmsprop">RMSprop</option>
+                            </select>
+                            <div class="form-text">Optimization algorithm</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="weight_decay" class="form-label">Weight Decay</label>
+                            <input type="number" class="form-control" id="weight_decay" name="weight_decay" 
+                                   value="0.0001" min="0.0" max="0.1" step="0.0001">
+                            <div class="form-text">L2 regularization coefficient</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="patience" class="form-label">Early Stopping Patience</label>
+                            <input type="number" class="form-control" id="patience" name="patience" 
+                                   value="10" min="1" max="50">
+                            <div class="form-text">Number of epochs to wait before early stopping</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dataset Configuration -->
+            <div class="parameter-section">
+                <h4><i class="fas fa-database"></i> Dataset Configuration</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="dataset" class="form-label">Dataset</label>
+                            <select class="form-select" id="dataset" name="dataset">
+                                <option value="cora">Cora (Citation Network)</option>
+                                <option value="citeseer">CiteSeer (Citation Network)</option>
+                                <option value="pubmed">PubMed (Biomedical)</option>
+                                <option value="karate">Karate Club (Social Network)</option>
+                                <option value="facebook">Facebook (Social Network)</option>
+                                <option value="twitter">Twitter (Social Network)</option>
+                            </select>
+                            <div class="form-text">Select a graph dataset</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="validation_split" class="form-label">Validation Split</label>
+                            <input type="number" class="form-control" id="validation_split" name="validation_split" 
+                                   value="0.2" min="0.1" max="0.5" step="0.1">
+                            <div class="form-text">Fraction of edges for validation</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="test_split" class="form-label">Test Split</label>
+                            <input type="number" class="form-control" id="test_split" name="test_split" 
+                                   value="0.2" min="0.1" max="0.5" step="0.1">
+                            <div class="form-text">Fraction of edges for testing</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="edge_sampling" class="form-label">Edge Sampling Strategy</label>
+                            <select class="form-select" id="edge_sampling" name="edge_sampling">
+                                <option value="uniform">Uniform Sampling</option>
+                                <option value="weighted">Weighted Sampling</option>
+                                <option value="stratified">Stratified Sampling</option>
+                                <option value="random_walk">Random Walk</option>
+                            </select>
+                            <div class="form-text">Strategy for sampling edges during training</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Training Controls -->
+            <div class="training-controls">
+                <h4><i class="fas fa-play-circle"></i> Training Controls</h4>
+                <div class="row">
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-success btn-lg w-100 mb-3" id="startTraining">
+                            <i class="fas fa-play"></i> Start Training
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-danger btn-lg w-100 mb-3" id="stopTraining" disabled>
+                            <i class="fas fa-stop"></i> Stop Training
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-warning btn-lg w-100 mb-3" id="resetTraining">
+                            <i class="fas fa-redo"></i> Reset Training
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Live Training Monitor -->
+            <div class="live-monitor" id="liveMonitor" style="display: none;">
+                <h4><i class="fas fa-chart-line"></i> Live Training Monitor</h4>
+                
+                <!-- Training Progress -->
+                <div class="mb-4">
+                    <label class="form-label">Epoch Progress</label>
+                    <div class="progress mb-2">
+                        <div class="progress-bar" id="epochProgress" role="progressbar" style="width: 0%"></div>
+                    </div>
+                    <small class="text-muted" id="epochText">0 / 0 epochs</small>
+                </div>
+
+                <!-- Live Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentLoss">-</div>
+                        <div class="metric-label">Training Loss</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentAccuracy">-</div>
+                        <div class="metric-label">Training Accuracy</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="validationLoss">-</div>
+                        <div class="metric-label">Validation Loss</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="validationAccuracy">-</div>
+                        <div class="metric-label">Validation Accuracy</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentF1">-</div>
+                        <div class="metric-label">F1 Score</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentPrecision">-</div>
+                        <div class="metric-label">Precision</div>
+                    </div>
+                </div>
+
+                <!-- Training Charts -->
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="lossChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="accuracyChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Quick Actions -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-outline-primary" id="saveModel">
+                                <i class="fas fa-save"></i> Save Model
+                            </button>
+                            <button type="button" class="btn btn-outline-success" id="viewResults">
+                                <i class="fas fa-chart-bar"></i> View Results
+                            </button>
+                            <button type="button" class="btn btn-outline-info" id="exportConfig">
+                                <i class="fas fa-download"></i> Export Config
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -246,100 +403,272 @@
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
-$(document).ready(function() {
-    let trainingInterval;
-    let currentEpoch = 0;
-    let totalEpochs = 100;
-    let isTraining = false;
-
-    // Form submission
-    $('#experimentForm').on('submit', function(e) {
-        e.preventDefault();
-        startTraining();
-    });
-
-    // Start training
-    function startTraining() {
-        isTraining = true;
-        currentEpoch = 0;
-        
-        // Update UI
-        $('#startTraining').prop('disabled', true);
-        $('#stopTraining').prop('disabled', false);
-        $('#trainingProgress').show();
-        $('#noTraining').hide();
-        
-        // Start progress simulation
-        trainingInterval = setInterval(function() {
-            currentEpoch++;
-            updateProgress();
-            
-            if (currentEpoch >= totalEpochs) {
-                stopTraining();
-                showResults();
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts
+    const lossCtx = document.getElementById('lossChart').getContext('2d');
+    const accuracyCtx = document.getElementById('accuracyChart').getContext('2d');
+    
+    const lossChart = new Chart(lossCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Training Loss',
+                data: [],
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }, {
+                label: 'Validation Loss',
+                data: [],
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Loss Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
             }
-        }, 100);
-    }
-
+        }
+    });
+    
+    const accuracyChart = new Chart(accuracyCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Training Accuracy',
+                data: [],
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.1
+            }, {
+                label: 'Validation Accuracy',
+                data: [],
+                borderColor: 'rgb(255, 159, 64)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Accuracy Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 1
+                }
+            }
+        }
+    });
+    
+    // Training state
+    let isTraining = false;
+    let currentEpoch = 0;
+    let totalEpochs = 0;
+    let trainingInterval;
+    
+    // Start training
+    document.getElementById('startTraining').addEventListener('click', function() {
+        if (isTraining) return;
+        
+        // Get parameters
+        const parameters = {
+            hidden_dim: parseInt(document.getElementById('hidden_dim').value),
+            num_layers: parseInt(document.getElementById('num_layers').value),
+            dropout: parseFloat(document.getElementById('dropout').value),
+            learning_rate: parseFloat(document.getElementById('learning_rate').value),
+            epochs: parseInt(document.getElementById('epochs').value),
+            batch_size: parseInt(document.getElementById('batch_size').value),
+            optimizer: document.getElementById('optimizer').value,
+            dataset: document.getElementById('dataset').value,
+            validation_split: parseFloat(document.getElementById('validation_split').value),
+            test_split: parseFloat(document.getElementById('test_split').value),
+            num_classes: parseInt(document.getElementById('num_classes').value),
+            edge_feature_dim: parseInt(document.getElementById('edge_feature_dim').value),
+            weight_decay: parseFloat(document.getElementById('weight_decay').value),
+            patience: parseInt(document.getElementById('patience').value),
+            edge_sampling: document.getElementById('edge_sampling').value
+        };
+        
+        // Start training simulation
+        startTrainingSimulation(parameters);
+    });
+    
     // Stop training
-    $('#stopTraining').on('click', function() {
+    document.getElementById('stopTraining').addEventListener('click', function() {
+        if (!isTraining) return;
         stopTraining();
     });
-
-    function stopTraining() {
+    
+    // Reset training
+    document.getElementById('resetTraining').addEventListener('click', function() {
+        resetTraining();
+    });
+    
+    function startTrainingSimulation(parameters) {
+        isTraining = true;
+        currentEpoch = 0;
+        totalEpochs = parameters.epochs;
+        
+        // Update UI
+        document.getElementById('startTraining').disabled = true;
+        document.getElementById('stopTraining').disabled = false;
+        document.getElementById('liveMonitor').style.display = 'block';
+        
+        // Simulate training
+        trainingInterval = setInterval(() => {
+            currentEpoch++;
+            
+            // Update progress
+            const epochProgress = (currentEpoch / totalEpochs) * 100;
+            document.getElementById('epochProgress').style.width = epochProgress + '%';
+            document.getElementById('epochText').textContent = `${currentEpoch} / ${totalEpochs} epochs`;
+            
+            // Simulate metrics for edge classification
+            const trainLoss = Math.max(0.1, 1.5 - (currentEpoch / totalEpochs) * 1.3);
+            const valLoss = trainLoss + Math.random() * 0.2;
+            const trainAcc = Math.min(0.95, 0.2 + (currentEpoch / totalEpochs) * 0.75);
+            const valAcc = trainAcc - Math.random() * 0.1;
+            const trainF1 = Math.min(0.93, 0.15 + (currentEpoch / totalEpochs) * 0.78);
+            const trainPrecision = Math.min(0.94, 0.18 + (currentEpoch / totalEpochs) * 0.76);
+            
+            // Update metrics
+            document.getElementById('currentLoss').textContent = trainLoss.toFixed(4);
+            document.getElementById('currentAccuracy').textContent = (trainAcc * 100).toFixed(2) + '%';
+            document.getElementById('validationLoss').textContent = valLoss.toFixed(4);
+            document.getElementById('validationAccuracy').textContent = (valAcc * 100).toFixed(2) + '%';
+            document.getElementById('currentF1').textContent = (trainF1 * 100).toFixed(2) + '%';
+            document.getElementById('currentPrecision').textContent = (trainPrecision * 100).toFixed(2) + '%';
+            
+            // Update charts
+            lossChart.data.labels.push(currentEpoch);
+            lossChart.data.datasets[0].data.push(trainLoss);
+            lossChart.data.datasets[1].data.push(valLoss);
+            lossChart.update();
+            
+            accuracyChart.data.labels.push(currentEpoch);
+            accuracyChart.data.datasets[0].data.push(trainAcc);
+            accuracyChart.data.datasets[1].data.push(valAcc);
+            accuracyChart.update();
+            
+            // Check if training is complete
+            if (currentEpoch >= totalEpochs) {
+                stopTraining(true); // true indicates natural completion
+            }
+        }, 100); // Update every 100ms for smooth animation
+    }
+    
+    function stopTraining(isCompleted = false, isReset = false) {
         isTraining = false;
         clearInterval(trainingInterval);
         
-        $('#startTraining').prop('disabled', false);
-        $('#stopTraining').prop('disabled', true);
-    }
-
-    // Update progress
-    function updateProgress() {
-        const progress = (currentEpoch / totalEpochs) * 100;
-        $('.progress-bar').css('width', progress + '%');
-        $('#currentEpoch').text(currentEpoch);
+        // Update UI
+        document.getElementById('startTraining').disabled = false;
+        document.getElementById('stopTraining').disabled = true;
         
-        // Simulate metrics
-        const trainLoss = Math.max(0.1, 0.8 - (currentEpoch * 0.007));
-        const valLoss = Math.max(0.15, 0.85 - (currentEpoch * 0.006));
-        const trainAcc = Math.min(0.95, 0.3 + (currentEpoch * 0.006));
-        const valAcc = Math.min(0.92, 0.25 + (currentEpoch * 0.005));
-        
-        $('#trainLoss').text(trainLoss.toFixed(3));
-        $('#valLoss').text(valLoss.toFixed(3));
-        $('#trainAcc').text((trainAcc * 100).toFixed(1) + '%');
-        $('#valAcc').text((valAcc * 100).toFixed(1) + '%');
-        
-        // Estimate time remaining
-        const timeRemaining = Math.max(0, totalEpochs - currentEpoch) * 0.1;
-        const minutes = Math.floor(timeRemaining / 60);
-        const seconds = Math.floor(timeRemaining % 60);
-        $('#timeRemaining').text(`${minutes}:${seconds.toString().padStart(2, '0')}`);
+        // Show appropriate notification
+        if (isReset) {
+            showNotification('Training reset', 'info');
+        } else if (isCompleted) {
+            showNotification('Training completed successfully!', 'success');
+        } else {
+            showNotification('Training stopped', 'warning');
+        }
     }
-
-    // Show results
-    function showResults() {
-        setTimeout(function() {
-            const modelId = '{{ model_id }}';
-            const purposeName = '{{ purpose_name }}';
-            window.location.href = `/purpose/${purposeName}/results/${modelId}`;
-        }, 1000);
+    
+    function resetTraining() {
+        stopTraining(false, true); // Pass isReset = true
+        
+        // Reset charts
+        lossChart.data.labels = [];
+        lossChart.data.datasets[0].data = [];
+        lossChart.data.datasets[1].data = [];
+        lossChart.update();
+        
+        accuracyChart.data.labels = [];
+        accuracyChart.data.datasets[0].data = [];
+        accuracyChart.data.datasets[1].data = [];
+        accuracyChart.update();
+        
+        // Reset progress
+        document.getElementById('epochProgress').style.width = '0%';
+        document.getElementById('epochText').textContent = '0 / 0 epochs';
+        document.getElementById('liveMonitor').style.display = 'none';
+        
+        // Reset metrics
+        document.getElementById('currentLoss').textContent = '-';
+        document.getElementById('currentAccuracy').textContent = '-';
+        document.getElementById('validationLoss').textContent = '-';
+        document.getElementById('validationAccuracy').textContent = '-';
+        document.getElementById('currentPrecision').textContent = '-';
+        document.getElementById('validationPrecision').textContent = '-';
     }
-
-    // Reset form
-    $('#resetForm').on('click', function() {
-        $('#experimentForm')[0].reset();
-        stopTraining();
-        $('#trainingProgress').hide();
-        $('#noTraining').show();
-        $('.progress-bar').css('width', '0%');
-        $('#currentEpoch').text('0');
-        $('#trainLoss, #valLoss, #trainAcc, #valAcc').text('-');
+    
+    function showNotification(message, type = 'info') {
+        if (window.GNNPlatform && window.GNNPlatform.showNotification) {
+            window.GNNPlatform.showNotification(message, type);
+        } else {
+            alert(message);
+        }
+    }
+    
+    // Quick action handlers
+    document.getElementById('saveModel').addEventListener('click', function() {
+        showNotification('Model saved successfully!', 'success');
+    });
+    
+    document.getElementById('viewResults').addEventListener('click', function() {
+        window.location.href = `/purpose/{{ purpose_name }}/results/${model_id}`;
+    });
+    
+    document.getElementById('exportConfig').addEventListener('click', function() {
+        const config = {
+            model: '{{ model_id }}',
+            purpose: '{{ purpose_name }}',
+            parameters: {
+                hidden_dim: document.getElementById('hidden_dim').value,
+                num_layers: document.getElementById('num_layers').value,
+                dropout: document.getElementById('dropout').value,
+                learning_rate: document.getElementById('learning_rate').value,
+                epochs: document.getElementById('epochs').value,
+                batch_size: document.getElementById('batch_size').value,
+                optimizer: document.getElementById('optimizer').value,
+                dataset: document.getElementById('dataset').value,
+                validation_split: document.getElementById('validation_split').value,
+                test_split: document.getElementById('test_split').value,
+                num_classes: document.getElementById('num_classes').value,
+                edge_feature_dim: document.getElementById('edge_feature_dim').value,
+                weight_decay: document.getElementById('weight_decay').value,
+                patience: document.getElementById('patience').value,
+                edge_sampling: document.getElementById('edge_sampling').value
+            }
+        };
+        
+        const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `gnn_config_${model_id}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        
+        showNotification('Configuration exported successfully!', 'success');
     });
 });
 </script>

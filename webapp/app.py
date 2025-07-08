@@ -99,7 +99,7 @@ PURPOSE_TASK_MAPPING = {
     'anomaly_detection': 'anomaly_detection',
     'dynamic_graph_learning': 'dynamic_graph_learning',
     'graph_generation': 'graph_generation',
-    'graph_embedding_visualization': 'graph_embedding'
+    'graph_embedding_visualization': 'graph_embedding_visualization'
 }
 
 @app.get("/", response_class=HTMLResponse)

@@ -16,6 +16,12 @@
         margin-bottom: 1.5rem;
     }
     
+    .parameter-group h5 {
+        color: var(--primary);
+        margin-bottom: 1rem;
+        font-weight: 600;
+    }
+    
     .form-label {
         font-weight: 500;
         color: var(--dark);
@@ -33,19 +39,45 @@
     }
     
     .training-controls {
-        background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+        background: linear-gradient(135deg, var(--primary) 0%, var(--purple) 100%);
         color: white;
         border-radius: 12px;
         padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
     
-    .progress-section {
+    .live-monitor {
         background: white;
         border-radius: 12px;
         padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    }
+    
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .metric-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary);
+    }
+    
+    .metric-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
     }
     
     .chart-container {
@@ -53,12 +85,17 @@
         margin-bottom: 1rem;
     }
     
-    .visualization-preview {
-        background: #f8f9fa;
-        border: 2px dashed #dee2e6;
+    .model-info {
+        background: rgba(255,255,255,0.1);
         border-radius: 8px;
-        padding: 2rem;
-        text-align: center;
+        padding: 1rem;
+        margin-bottom: 1rem;
+    }
+    
+    .dataset-info {
+        background: rgba(255,255,255,0.1);
+        border-radius: 8px;
+        padding: 1rem;
         margin-bottom: 1rem;
     }
 </style>
@@ -87,8 +124,8 @@
     </div>
 
     <div class="row">
-        <!-- Left Column - Parameters and Controls -->
-        <div class="col-lg-8">
+        <!-- Main Content - Parameters -->
+        <div class="col-12">
             <!-- Model Information -->
             <div class="parameter-section">
                 <h4><i class="fas fa-info-circle"></i> Model Information</h4>
@@ -96,11 +133,20 @@
                     <div class="col-md-6">
                         <p><strong>Model:</strong> {{ model.name }}</p>
                         <p><strong>Paper:</strong> {{ model.paper }}</p>
-                        <p><strong>Type:</strong> Graph Embedding</p>
+                        <p><strong>Type:</strong> Graph Embedding Visualization</p>
                     </div>
                     <div class="col-md-6">
-                        <p><strong>Architecture:</strong> {{ model.architecture }}</p>
-                        <p><strong>Applications:</strong> {{ model.applications|join(', ') }}</p>
+                        <p><strong>Formula:</strong> <code>{{ model.formula if model.formula else 'P(c_i = x | c_{i-1} = v) = π_{vx}/Z, π_{vx} = α_{pq}(t,x) · w_{vx}' }}</code></p>
+                        <p><strong>Applications:</strong> {{ model.applications|join(', ') if model.applications else 'Social Network Analysis, Recommendation Systems, Community Detection, Link Prediction, Node Classification' }}</p>
+                    </div>
+                </div>
+                <!-- Debug information -->
+                <div class="row mt-3">
+                    <div class="col-12">
+                        <details>
+                            <summary>Debug: Model Data</summary>
+                            <pre>{{ model | tojson(indent=2) }}</pre>
+                        </details>
                     </div>
                 </div>
             </div>
@@ -111,18 +157,18 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="parameter-group">
-                            <label for="hidden_dim" class="form-label">Hidden Dimension</label>
-                            <input type="number" class="form-control" id="hidden_dim" name="hidden_dim" 
-                                   value="{{ default_params.hidden_dim }}" min="16" max="512" step="16">
-                            <div class="form-text">Dimension of hidden layers (16-512)</div>
+                            <label for="embedding_dim" class="form-label">Embedding Dimension</label>
+                            <input type="number" class="form-control" id="embedding_dim" name="embedding_dim" 
+                                   value="{{ default_params.embedding_dim }}" min="16" max="512" step="16">
+                            <div class="form-text">Dimension of the learned embeddings (16-512)</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="parameter-group">
-                            <label for="embedding_dim" class="form-label">Embedding Dimension</label>
-                            <input type="number" class="form-control" id="embedding_dim" name="embedding_dim" 
-                                   value="{{ default_params.embedding_dim }}" min="8" max="512" step="8">
-                            <div class="form-text">Dimension of final embeddings (8-512)</div>
+                            <label for="hidden_dim" class="form-label">Hidden Dimension</label>
+                            <input type="number" class="form-control" id="hidden_dim" name="hidden_dim" 
+                                   value="{{ default_params.hidden_dim }}" min="32" max="1024" step="32">
+                            <div class="form-text">Number of hidden units in each layer (32-1024)</div>
                         </div>
                     </div>
                 </div>
@@ -132,15 +178,30 @@
                             <label for="num_layers" class="form-label">Number of Layers</label>
                             <input type="number" class="form-control" id="num_layers" name="num_layers" 
                                    value="{{ default_params.num_layers }}" min="1" max="10">
-                            <div class="form-text">Number of GNN layers (1-10)</div>
+                            <div class="form-text">Number of graph convolution layers (1-10)</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="parameter-group">
                             <label for="dropout" class="form-label">Dropout Rate</label>
                             <input type="number" class="form-control" id="dropout" name="dropout" 
-                                   value="{{ default_params.dropout }}" min="0.0" max="0.5" step="0.1">
-                            <div class="form-text">Dropout rate for regularization (0.0-0.5)</div>
+                                   value="{{ default_params.dropout }}" min="0.0" max="0.9" step="0.1">
+                            <div class="form-text">Dropout rate for regularization (0.0-0.9)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="activation" class="form-label">Activation Function</label>
+                            <select class="form-select" id="activation" name="activation">
+                                <option value="relu">ReLU</option>
+                                <option value="tanh">Tanh</option>
+                                <option value="sigmoid">Sigmoid</option>
+                                <option value="leaky_relu">Leaky ReLU</option>
+                                <option value="elu">ELU</option>
+                            </select>
+                            <div class="form-text">Activation function for hidden layers</div>
                         </div>
                     </div>
                 </div>
@@ -152,51 +213,54 @@
                 <div class="row">
                     <div class="col-md-6">
                         <div class="parameter-group">
-                            <label for="embedding_type" class="form-label">Embedding Type</label>
-                            <select class="form-select" id="embedding_type" name="embedding_type">
-                                <option value="node">Node Embeddings</option>
-                                <option value="edge">Edge Embeddings</option>
-                                <option value="graph">Graph Embeddings</option>
-                                <option value="subgraph">Subgraph Embeddings</option>
-                            </select>
-                            <div class="form-text">Type of embedding to generate</div>
+                            <label for="walk_length" class="form-label">Walk Length</label>
+                            <input type="number" class="form-control" id="walk_length" name="walk_length" 
+                                   value="80" min="10" max="200">
+                            <div class="form-text">Length of random walks for Node2Vec/DeepWalk (10-200)</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="parameter-group">
-                            <label for="embedding_method" class="form-label">Embedding Method</label>
-                            <select class="form-select" id="embedding_method" name="embedding_method">
-                                <option value="unsupervised">Unsupervised</option>
-                                <option value="supervised">Supervised</option>
-                                <option value="semi_supervised">Semi-supervised</option>
-                                <option value="contrastive">Contrastive</option>
-                            </select>
-                            <div class="form-text">Method for generating embeddings</div>
+                            <label for="num_walks" class="form-label">Number of Walks</label>
+                            <input type="number" class="form-control" id="num_walks" name="num_walks" 
+                                   value="10" min="1" max="50">
+                            <div class="form-text">Number of random walks per node (1-50)</div>
                         </div>
                     </div>
                 </div>
                 <div class="row">
                     <div class="col-md-6">
                         <div class="parameter-group">
-                            <label for="readout_method" class="form-label">Readout Method</label>
-                            <select class="form-select" id="readout_method" name="readout_method">
-                                <option value="mean">Mean</option>
-                                <option value="sum">Sum</option>
-                                <option value="max">Max</option>
-                                <option value="attention">Attention</option>
-                                <option value="sort">Sort</option>
-                            </select>
-                            <div class="form-text">Method to aggregate node features</div>
+                            <label for="p" class="form-label">Return Parameter (p)</label>
+                            <input type="number" class="form-control" id="p" name="p" 
+                                   value="1.0" min="0.1" max="10.0" step="0.1">
+                            <div class="form-text">Return parameter for Node2Vec biased walks (0.1-10.0)</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="parameter-group">
-                            <label for="normalize_embeddings" class="form-label">Normalize Embeddings</label>
-                            <select class="form-select" id="normalize_embeddings" name="normalize_embeddings">
-                                <option value="true">Yes</option>
-                                <option value="false">No</option>
-                            </select>
-                            <div class="form-text">Whether to normalize embeddings</div>
+                            <label for="q" class="form-label">In-Out Parameter (q)</label>
+                            <input type="number" class="form-control" id="q" name="q" 
+                                   value="1.0" min="0.1" max="10.0" step="0.1">
+                            <div class="form-text">In-out parameter for Node2Vec biased walks (0.1-10.0)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="window_size" class="form-label">Window Size</label>
+                            <input type="number" class="form-control" id="window_size" name="window_size" 
+                                   value="10" min="1" max="20">
+                            <div class="form-text">Context window size for skip-gram (1-20)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="negative_samples" class="form-label">Negative Samples</label>
+                            <input type="number" class="form-control" id="negative_samples" name="negative_samples" 
+                                   value="5" min="1" max="20">
+                            <div class="form-text">Number of negative samples for training (1-20)</div>
                         </div>
                     </div>
                 </div>
@@ -210,7 +274,7 @@
                         <div class="parameter-group">
                             <label for="learning_rate" class="form-label">Learning Rate</label>
                             <input type="number" class="form-control" id="learning_rate" name="learning_rate" 
-                                   value="{{ default_params.learning_rate }}" min="0.00001" max="0.1" step="0.0001">
+                                   value="{{ default_params.learning_rate }}" min="0.0001" max="0.1" step="0.0001">
                             <div class="form-text">Learning rate for optimization</div>
                         </div>
                     </div>
@@ -228,20 +292,108 @@
                         <div class="parameter-group">
                             <label for="batch_size" class="form-label">Batch Size</label>
                             <input type="number" class="form-control" id="batch_size" name="batch_size" 
-                                   value="{{ default_params.batch_size }}" min="1" max="256">
-                            <div class="form-text">Batch size for training</div>
+                                   value="256" min="32" max="2048">
+                            <div class="form-text">Batch size for training (32-2048)</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="parameter-group">
-                            <label for="optimizer" class="form-label">Optimizer</label>
-                            <select class="form-select" id="optimizer" name="optimizer">
-                                <option value="adam">Adam</option>
-                                <option value="sgd">SGD</option>
-                                <option value="adamw">AdamW</option>
-                                <option value="rmsprop">RMSprop</option>
+                            <label for="weight_decay" class="form-label">Weight Decay</label>
+                            <input type="number" class="form-control" id="weight_decay" name="weight_decay" 
+                                   value="0.0001" min="0.0" max="0.01" step="0.0001">
+                            <div class="form-text">Weight decay for regularization</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="scheduler" class="form-label">Learning Rate Scheduler</label>
+                            <select class="form-select" id="scheduler" name="scheduler">
+                                <option value="none">None</option>
+                                <option value="step">Step</option>
+                                <option value="cosine">Cosine</option>
+                                <option value="exponential">Exponential</option>
+                                <option value="plateau">Plateau</option>
                             </select>
-                            <div class="form-text">Optimization algorithm</div>
+                            <div class="form-text">Learning rate scheduling strategy</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="patience" class="form-label">Early Stopping Patience</label>
+                            <input type="number" class="form-control" id="patience" name="patience" 
+                                   value="20" min="5" max="100">
+                            <div class="form-text">Patience for early stopping (5-100)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Visualization Parameters -->
+            <div class="parameter-section">
+                <h4><i class="fas fa-chart-line"></i> Visualization Parameters</h4>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="visualization_method" class="form-label">Visualization Method</label>
+                            <select class="form-select" id="visualization_method" name="visualization_method">
+                                <option value="tsne">t-SNE</option>
+                                <option value="umap">UMAP</option>
+                                <option value="pca">PCA</option>
+                                <option value="mds">MDS</option>
+                                <option value="isomap">Isomap</option>
+                            </select>
+                            <div class="form-text">Dimensionality reduction method for visualization</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="perplexity" class="form-label">t-SNE Perplexity</label>
+                            <input type="number" class="form-control" id="perplexity" name="perplexity" 
+                                   value="30" min="5" max="100">
+                            <div class="form-text">Perplexity parameter for t-SNE (5-100)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="n_neighbors" class="form-label">UMAP Neighbors</label>
+                            <input type="number" class="form-control" id="n_neighbors" name="n_neighbors" 
+                                   value="15" min="5" max="50">
+                            <div class="form-text">Number of neighbors for UMAP (5-50)</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="min_dist" class="form-label">UMAP Min Distance</label>
+                            <input type="number" class="form-control" id="min_dist" name="min_dist" 
+                                   value="0.1" min="0.01" max="1.0" step="0.01">
+                            <div class="form-text">Minimum distance for UMAP (0.01-1.0)</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="clustering_method" class="form-label">Clustering Method</label>
+                            <select class="form-select" id="clustering_method" name="clustering_method">
+                                <option value="kmeans">K-Means</option>
+                                <option value="dbscan">DBSCAN</option>
+                                <option value="spectral">Spectral</option>
+                                <option value="hierarchical">Hierarchical</option>
+                                <option value="gmm">Gaussian Mixture</option>
+                            </select>
+                            <div class="form-text">Clustering method for embedding analysis</div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="n_clusters" class="form-label">Number of Clusters</label>
+                            <input type="number" class="form-control" id="n_clusters" name="n_clusters" 
+                                   value="5" min="2" max="20">
+                            <div class="form-text">Number of clusters for clustering analysis (2-20)</div>
                         </div>
                     </div>
                 </div>
@@ -255,26 +407,36 @@
                         <div class="parameter-group">
                             <label for="dataset" class="form-label">Dataset</label>
                             <select class="form-select" id="dataset" name="dataset">
-                                <option value="cora">Cora Citation Network</option>
-                                <option value="citeseer">CiteSeer Citation Network</option>
-                                <option value="pubmed">PubMed Citation Network</option>
-                                <option value="ppi">Protein-Protein Interaction</option>
-                                <option value="reddit">Reddit Social Network</option>
-                                <option value="flickr">Flickr Social Network</option>
+                                <option value="cora">Cora (Citation Network)</option>
+                                <option value="citeseer">CiteSeer (Citation Network)</option>
+                                <option value="pubmed">PubMed (Citation Network)</option>
+                                <option value="amazon_photo">Amazon Photo (Co-purchase)</option>
+                                <option value="amazon_computers">Amazon Computers (Co-purchase)</option>
+                                <option value="coauthor_cs">Coauthor CS (Collaboration)</option>
+                                <option value="coauthor_physics">Coauthor Physics (Collaboration)</option>
+                                <option value="reddit">Reddit (Social Network)</option>
+                                <option value="flickr">Flickr (Social Network)</option>
+                                <option value="synthetic">Synthetic (Generated)</option>
                             </select>
-                            <div class="form-text">Graph dataset for embedding</div>
+                            <div class="form-text">Select a graph dataset for embedding</div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="parameter-group">
-                            <label for="visualization_method" class="form-label">Visualization Method</label>
-                            <select class="form-select" id="visualization_method" name="visualization_method">
-                                <option value="tsne">t-SNE</option>
-                                <option value="umap">UMAP</option>
-                                <option value="pca">PCA</option>
-                                <option value="mds">MDS</option>
-                            </select>
-                            <div class="form-text">Dimensionality reduction for visualization</div>
+                            <label for="validation_split" class="form-label">Validation Split</label>
+                            <input type="number" class="form-control" id="validation_split" name="validation_split" 
+                                   value="0.2" min="0.1" max="0.5" step="0.05">
+                            <div class="form-text">Fraction of data for validation</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="parameter-group">
+                            <label for="test_split" class="form-label">Test Split</label>
+                            <input type="number" class="form-control" id="test_split" name="test_split" 
+                                   value="0.1" min="0.05" max="0.3" step="0.05">
+                            <div class="form-text">Fraction of data for testing</div>
                         </div>
                     </div>
                 </div>
@@ -283,220 +445,578 @@
             <!-- Training Controls -->
             <div class="training-controls">
                 <h4><i class="fas fa-play-circle"></i> Training Controls</h4>
-                <div class="d-flex gap-2">
-                    <button type="button" class="btn btn-light" id="startTraining">
-                        <i class="fas fa-play me-1"></i>
-                        Start Training
-                    </button>
-                    <button type="button" class="btn btn-light" id="stopTraining" disabled>
-                        <i class="fas fa-stop me-1"></i>
-                        Stop Training
-                    </button>
-                    <button type="button" class="btn btn-light" id="resetForm">
-                        <i class="fas fa-undo me-1"></i>
-                        Reset
-                    </button>
+                <div class="row">
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-success btn-lg w-100 mb-3" id="startTraining">
+                            <i class="fas fa-play"></i> Start Training
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-danger btn-lg w-100 mb-3" id="stopTraining" disabled>
+                            <i class="fas fa-stop"></i> Stop Training
+                        </button>
+                    </div>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-warning btn-lg w-100 mb-3" id="resetTraining">
+                            <i class="fas fa-redo"></i> Reset Training
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Live Training Monitor -->
+    <div class="live-monitor" id="liveMonitor" style="display: none;">
+        <h4><i class="fas fa-chart-line"></i> Live Training Monitor</h4>
+        
+        <!-- Training Progress -->
+        <div class="mb-4">
+            <label class="form-label">Epoch Progress</label>
+            <div class="progress mb-2">
+                <div class="progress-bar" id="epochProgress" role="progressbar" style="width: 0%"></div>
+            </div>
+            <small class="text-muted" id="epochText">0 / 0 epochs</small>
+        </div>
+
+        <!-- Live Metrics -->
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value" id="currentLoss">-</div>
+                <div class="metric-label">Training Loss</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="clusteringScore">-</div>
+                <div class="metric-label">Clustering Score</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="silhouetteScore">-</div>
+                <div class="metric-label">Silhouette Score</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="linkPredictionAuc">-</div>
+                <div class="metric-label">Link Prediction AUC</div>
+            </div>
+        </div>
+
+        <!-- Training Charts -->
+        <div class="row">
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <canvas id="lossChart"></canvas>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="chart-container">
+                    <canvas id="metricsChart"></canvas>
                 </div>
             </div>
         </div>
 
-        <!-- Right Column - Progress and Results -->
-        <div class="col-lg-4">
-            <!-- Training Progress -->
-            <div class="progress-section">
-                <h4><i class="fas fa-chart-line"></i> Training Progress</h4>
-                <div id="trainingProgress" style="display: none;">
-                    <div class="mb-3">
-                        <label class="form-label">Progress</label>
-                        <div class="progress">
-                            <div class="progress-bar" role="progressbar" style="width: 0%"></div>
-                        </div>
-                        <small class="text-muted">Epoch: <span id="currentEpoch">0</span> / <span id="totalEpochs">100</span></small>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <h6>Current Metrics</h6>
-                        <div class="row text-center">
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <small class="text-muted">Train Loss</small>
-                                    <div id="trainLoss">-</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <small class="text-muted">Val Loss</small>
-                                    <div id="valLoss">-</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="mb-3">
-                        <div class="row text-center">
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <small class="text-muted">Link AUC</small>
-                                    <div id="linkAuc">-</div>
-                                </div>
-                            </div>
-                            <div class="col-6">
-                                <div class="border rounded p-2">
-                                    <small class="text-muted">Node Acc</small>
-                                    <div id="nodeAcc">-</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="text-center">
-                        <small class="text-muted">Estimated time remaining: <span id="timeRemaining">-</span></small>
-                    </div>
+        <!-- Quick Actions -->
+        <div class="row mt-4">
+            <div class="col-12">
+                <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                <div class="d-flex gap-2 flex-wrap">
+                    <button type="button" class="btn btn-outline-primary" id="saveModel">
+                        <i class="fas fa-save"></i> Save Model
+                    </button>
+                    <button type="button" class="btn btn-outline-success" id="viewResults">
+                        <i class="fas fa-chart-bar"></i> View Results
+                    </button>
+                    <button type="button" class="btn btn-outline-info" id="exportConfig">
+                        <i class="fas fa-download"></i> Export Config
+                    </button>
                 </div>
-                
-                <div id="noTraining" class="text-center text-muted">
-                    <i class="fas fa-play-circle fa-3x mb-3"></i>
-                    <p>Click "Start Training" to begin the experiment</p>
-                </div>
-            </div>
-
-            <!-- Visualization Preview -->
-            <div class="progress-section">
-                <h4><i class="fas fa-chart-scatter"></i> Visualization Preview</h4>
-                <div class="visualization-preview">
-                    <i class="fas fa-chart-scatter fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">Embedding visualization will appear here after training</p>
-                    <small class="text-muted">t-SNE, UMAP, or PCA projection</small>
-                </div>
-            </div>
-
-            <!-- Model Information -->
-            <div class="progress-section">
-                <h4><i class="fas fa-info-circle"></i> Model Details</h4>
-                <ul class="list-unstyled">
-                    <li><strong>Category:</strong> {{ model.category }}</li>
-                    <li><strong>Architecture:</strong> {{ model.architecture }}</li>
-                    <li><strong>Inductive:</strong> {{ "Yes" if model.inductive else "No" }}</li>
-                </ul>
-                
-                <h6>Use Cases</h6>
-                <ul class="list-unstyled">
-                    <li>• Graph visualization and exploration</li>
-                    <li>• Node similarity analysis</li>
-                    <li>• Community detection</li>
-                    <li>• Link prediction</li>
-                    <li>• Dimensionality reduction</li>
-                </ul>
             </div>
         </div>
     </div>
 </div>
-{% endblock %}
 
-{% block scripts %}
 <script>
-$(document).ready(function() {
-    let trainingInterval;
-    let currentEpoch = 0;
-    let totalEpochs = 100;
-    let isTraining = false;
-
-    // Start training
-    $('#startTraining').on('click', function() {
-        startTraining();
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize charts
+    const lossCtx = document.getElementById('lossChart').getContext('2d');
+    const metricsCtx = document.getElementById('metricsChart').getContext('2d');
+    
+    const lossChart = new Chart(lossCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Training Loss',
+                data: [],
+                borderColor: 'rgb(75, 192, 192)',
+                tension: 0.1
+            }, {
+                label: 'Validation Loss',
+                data: [],
+                borderColor: 'rgb(255, 99, 132)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Loss Over Time'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true
+                }
+            }
+        }
     });
-
+    
+    const metricsChart = new Chart(metricsCtx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [{
+                label: 'Clustering Score',
+                data: [],
+                borderColor: 'rgb(54, 162, 235)',
+                tension: 0.1
+            }, {
+                label: 'Silhouette Score',
+                data: [],
+                borderColor: 'rgb(255, 159, 64)',
+                tension: 0.1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                title: {
+                    display: true,
+                    text: 'Evaluation Metrics'
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    max: 1
+                }
+            }
+        }
+    });
+    
+    // Training state
+    let isTraining = false;
+    let currentEpoch = 0;
+    let totalEpochs = 0;
+    let trainingInterval;
+    
+    // Start training
+    document.getElementById('startTraining').addEventListener('click', function() {
+        if (isTraining) return;
+        
+        // Get parameters
+        const parameters = {
+            embedding_dim: parseInt(document.getElementById('embedding_dim').value),
+            hidden_dim: parseInt(document.getElementById('hidden_dim').value),
+            num_layers: parseInt(document.getElementById('num_layers').value),
+            dropout: parseFloat(document.getElementById('dropout').value),
+            activation: document.getElementById('activation').value,
+            walk_length: parseInt(document.getElementById('walk_length').value),
+            num_walks: parseInt(document.getElementById('num_walks').value),
+            p: parseFloat(document.getElementById('p').value),
+            q: parseFloat(document.getElementById('q').value),
+            window_size: parseInt(document.getElementById('window_size').value),
+            negative_samples: parseInt(document.getElementById('negative_samples').value),
+            learning_rate: parseFloat(document.getElementById('learning_rate').value),
+            epochs: parseInt(document.getElementById('epochs').value),
+            batch_size: parseInt(document.getElementById('batch_size').value),
+            weight_decay: parseFloat(document.getElementById('weight_decay').value),
+            scheduler: document.getElementById('scheduler').value,
+            patience: parseInt(document.getElementById('patience').value),
+            visualization_method: document.getElementById('visualization_method').value,
+            perplexity: parseInt(document.getElementById('perplexity').value),
+            n_neighbors: parseInt(document.getElementById('n_neighbors').value),
+            min_dist: parseFloat(document.getElementById('min_dist').value),
+            clustering_method: document.getElementById('clustering_method').value,
+            n_clusters: parseInt(document.getElementById('n_clusters').value),
+            validation_split: parseFloat(document.getElementById('validation_split').value),
+            test_split: parseFloat(document.getElementById('test_split').value)
+        };
+        
+        // Start training simulation
+        startTrainingSimulation(parameters);
+    });
+    
     // Stop training
-    $('#stopTraining').on('click', function() {
+    document.getElementById('stopTraining').addEventListener('click', function() {
+        if (!isTraining) return;
         stopTraining();
     });
-
-    // Reset form
-    $('#resetForm').on('click', function() {
-        resetForm();
+    
+    // Reset training
+    document.getElementById('resetTraining').addEventListener('click', function() {
+        resetTraining();
     });
-
-    function startTraining() {
+    
+    function startTrainingSimulation(parameters) {
         isTraining = true;
         currentEpoch = 0;
+        totalEpochs = parameters.epochs;
+        
+        // Generate and store experiment ID at the start
+        const experimentId = `exp_${Date.now()}`;
+        localStorage.setItem('current_experiment_id', experimentId);
+        
+        // Show live training monitor
+        document.getElementById('liveMonitor').style.display = 'block';
         
         // Update UI
-        $('#startTraining').prop('disabled', true);
-        $('#stopTraining').prop('disabled', false);
-        $('#trainingProgress').show();
-        $('#noTraining').hide();
+        document.getElementById('startTraining').disabled = true;
+        document.getElementById('stopTraining').disabled = false;
         
-        // Start progress simulation
-        trainingInterval = setInterval(function() {
+        // Simulate training
+        trainingInterval = setInterval(() => {
             currentEpoch++;
-            updateProgress();
             
+            // Update progress
+            const epochProgress = (currentEpoch / totalEpochs) * 100;
+            document.getElementById('epochProgress').style.width = epochProgress + '%';
+            document.getElementById('epochText').textContent = `${currentEpoch} / ${totalEpochs} epochs`;
+            
+            // Simulate metrics for graph embedding
+            const trainLoss = Math.max(0.05, 0.8 - (currentEpoch / totalEpochs) * 0.7);
+            const valLoss = trainLoss + Math.random() * 0.1;
+            const clusteringScore = Math.min(0.98, 0.5 + (currentEpoch / totalEpochs) * 0.45);
+            const silhouetteScore = Math.min(0.95, 0.3 + (currentEpoch / totalEpochs) * 0.6);
+            const linkPredictionAuc = Math.min(0.99, 0.6 + (currentEpoch / totalEpochs) * 0.35);
+            
+            // Update metrics
+            document.getElementById('currentLoss').textContent = trainLoss.toFixed(4);
+            document.getElementById('clusteringScore').textContent = clusteringScore.toFixed(4);
+            document.getElementById('silhouetteScore').textContent = silhouetteScore.toFixed(4);
+            document.getElementById('linkPredictionAuc').textContent = linkPredictionAuc.toFixed(4);
+            
+            // Update charts
+            lossChart.data.labels.push(currentEpoch);
+            lossChart.data.datasets[0].data.push(trainLoss);
+            lossChart.data.datasets[1].data.push(valLoss);
+            lossChart.update();
+            
+            metricsChart.data.labels.push(currentEpoch);
+            metricsChart.data.datasets[0].data.push(clusteringScore);
+            metricsChart.data.datasets[1].data.push(silhouetteScore);
+            metricsChart.update();
+            
+            // Check if training is complete
             if (currentEpoch >= totalEpochs) {
-                stopTraining();
-                showResults();
+                stopTraining(true); // true indicates natural completion
             }
-        }, 100);
+        }, 100); // Update every 100ms for smooth animation
     }
-
-    function stopTraining() {
+    
+    function stopTraining(isCompleted = false, isReset = false) {
         isTraining = false;
         clearInterval(trainingInterval);
         
-        $('#startTraining').prop('disabled', false);
-        $('#stopTraining').prop('disabled', true);
+        // Update UI
+        document.getElementById('startTraining').disabled = false;
+        document.getElementById('stopTraining').disabled = true;
+        
+        // If training completed (not stopped early), save results
+        if (currentEpoch >= totalEpochs) {
+            saveExperimentResults();
+        }
+        
+        // Show appropriate notification
+        if (isReset) {
+            showNotification('Training reset', 'info');
+        } else if (isCompleted) {
+            showNotification('Training completed successfully!', 'success');
+        } else {
+            showNotification('Training stopped', 'warning');
+        }
     }
-
-    function updateProgress() {
-        const progress = (currentEpoch / totalEpochs) * 100;
-        $('.progress-bar').css('width', progress + '%');
-        $('#currentEpoch').text(currentEpoch);
-        
-        // Simulate metrics for graph embedding
-        const trainLoss = Math.max(0.05, 0.8 - (currentEpoch * 0.007));
-        const valLoss = Math.max(0.08, 0.85 - (currentEpoch * 0.006));
-        const linkAuc = Math.min(0.98, 0.5 + (currentEpoch * 0.004));
-        const nodeAcc = Math.min(0.95, 0.3 + (currentEpoch * 0.006));
-        
-        $('#trainLoss').text(trainLoss.toFixed(3));
-        $('#valLoss').text(valLoss.toFixed(3));
-        $('#linkAuc').text((linkAuc * 100).toFixed(1) + '%');
-        $('#nodeAcc').text((nodeAcc * 100).toFixed(1) + '%');
-        
-        // Estimate time remaining
-        const timeRemaining = Math.max(0, totalEpochs - currentEpoch) * 0.1;
-        const minutes = Math.floor(timeRemaining / 60);
-        const seconds = Math.floor(timeRemaining % 60);
-        $('#timeRemaining').text(`${minutes}:${seconds.toString().padStart(2, '0')}`);
+    
+    async function saveExperimentResults() {
+        try {
+            // Use the current experiment ID if available, otherwise generate new one
+            const experimentId = localStorage.getItem('current_experiment_id') || `exp_${Date.now()}`;
+            
+            // Collect the actual training history from the charts
+            const trainingHistory = {
+                epochs: lossChart.data.labels,
+                train_loss: lossChart.data.datasets[0].data,
+                val_loss: lossChart.data.datasets[1].data,
+                clustering_score: metricsChart.data.datasets[0].data,
+                silhouette_score: metricsChart.data.datasets[1].data
+            };
+            
+            // Calculate final metrics from the actual training data
+            const finalClusteringScore = trainingHistory.clustering_score[trainingHistory.clustering_score.length - 1] || 0;
+            const finalSilhouetteScore = trainingHistory.silhouette_score[trainingHistory.silhouette_score.length - 1] || 0;
+            const finalTrainLoss = trainingHistory.train_loss[trainingHistory.train_loss.length - 1] || 0;
+            const finalValLoss = trainingHistory.val_loss[trainingHistory.val_loss.length - 1] || 0;
+            
+            // Prepare results data with actual training data
+            const resultsData = {
+                experiment_id: experimentId,
+                task_name: 'graph_embedding_visualization',
+                model_name: '{{ model_id }}',
+                dataset_name: document.getElementById('dataset').value || 'cora',
+                parameters: {
+                    embedding_dim: parseInt(document.getElementById('embedding_dim').value),
+                    hidden_dim: parseInt(document.getElementById('hidden_dim').value),
+                    num_layers: parseInt(document.getElementById('num_layers').value),
+                    dropout: parseFloat(document.getElementById('dropout').value),
+                    activation: document.getElementById('activation').value,
+                    walk_length: parseInt(document.getElementById('walk_length').value),
+                    num_walks: parseInt(document.getElementById('num_walks').value),
+                    p: parseFloat(document.getElementById('p').value),
+                    q: parseFloat(document.getElementById('q').value),
+                    window_size: parseInt(document.getElementById('window_size').value),
+                    negative_samples: parseInt(document.getElementById('negative_samples').value),
+                    learning_rate: parseFloat(document.getElementById('learning_rate').value),
+                    epochs: parseInt(document.getElementById('epochs').value),
+                    batch_size: parseInt(document.getElementById('batch_size').value),
+                    weight_decay: parseFloat(document.getElementById('weight_decay').value),
+                    scheduler: document.getElementById('scheduler').value,
+                    patience: parseInt(document.getElementById('patience').value),
+                    visualization_method: document.getElementById('visualization_method').value,
+                    perplexity: parseInt(document.getElementById('perplexity').value),
+                    n_neighbors: parseInt(document.getElementById('n_neighbors').value),
+                    min_dist: parseFloat(document.getElementById('min_dist').value),
+                    clustering_method: document.getElementById('clustering_method').value,
+                    n_clusters: parseInt(document.getElementById('n_clusters').value),
+                    validation_split: parseFloat(document.getElementById('validation_split').value),
+                    test_split: parseFloat(document.getElementById('test_split').value)
+                },
+                metrics: {
+                    clustering_score: finalClusteringScore,
+                    silhouette_score: finalSilhouetteScore,
+                    train_loss: finalTrainLoss,
+                    val_loss: finalValLoss,
+                    link_prediction_auc: Math.min(0.99, 0.6 + finalClusteringScore * 0.35)
+                },
+                training_history: trainingHistory,
+                status: 'completed',
+                start_time: new Date().toISOString(),
+                save_time: new Date().toISOString()
+            };
+            
+            // Save results to backend
+            const response = await fetch(`/purpose/graph_embedding_visualization/api/save_experiment_results/${experimentId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(resultsData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                showNotification('Experiment results saved successfully!', 'success');
+                
+                // Store experiment ID for later use
+                localStorage.setItem('current_experiment_id', experimentId);
+                
+                // Enable view results button
+                document.getElementById('viewResults').disabled = false;
+            } else {
+                const error = await response.json();
+                showNotification(`Failed to save results: ${error.detail}`, 'error');
+            }
+        } catch (error) {
+            showNotification(`Error saving results: ${error.message}`, 'error');
+        }
     }
-
-    function showResults() {
-        setTimeout(function() {
-            const modelId = '{{ model_id }}';
-            const purposeName = '{{ purpose_name }}';
-            window.location.href = `/purpose/${purposeName}/results/${modelId}`;
-        }, 1000);
-    }
-
-    function resetForm() {
-        // Reset form fields to defaults
-        $('#hidden_dim').val('{{ default_params.hidden_dim }}');
-        $('#embedding_dim').val('{{ default_params.embedding_dim }}');
-        $('#num_layers').val('{{ default_params.num_layers }}');
-        $('#dropout').val('{{ default_params.dropout }}');
-        $('#learning_rate').val('{{ default_params.learning_rate }}');
-        $('#epochs').val('{{ default_params.epochs }}');
-        $('#batch_size').val('{{ default_params.batch_size }}');
+    
+    function resetTraining() {
+        stopTraining(false, true); // Pass isReset = true
         
-        // Stop training if running
-        stopTraining();
+        // Reset charts
+        lossChart.data.labels = [];
+        lossChart.data.datasets[0].data = [];
+        lossChart.data.datasets[1].data = [];
+        lossChart.update();
         
         // Reset progress
-        $('#trainingProgress').hide();
-        $('#noTraining').show();
-        $('.progress-bar').css('width', '0%');
-        $('#currentEpoch').text('0');
-        $('#trainLoss, #valLoss, #linkAuc, #nodeAcc').text('-');
+        document.getElementById('epochProgress').style.width = '0%';
+        document.getElementById('epochText').textContent = '0 / 0 epochs';
+        document.getElementById('liveMonitor').style.display = 'none';
+        
+        // Reset metrics
+        document.getElementById('currentLoss').textContent = '-';
+        document.getElementById('currentAccuracy').textContent = '-';
+        document.getElementById('validationLoss').textContent = '-';
+        document.getElementById('validationAccuracy').textContent = '-';
     }
+    
+    function showNotification(message, type = 'info') {
+        if (window.GNNPlatform && window.GNNPlatform.showNotification) {
+            window.GNNPlatform.showNotification(message, type);
+        } else {
+            alert(message);
+        }
+    }
+    
+    // Quick action handlers
+    document.getElementById('saveModel').addEventListener('click', async function() {
+        try {
+            // Get current experiment data
+            const experimentData = {
+                model_name: '{{ model_id }}',
+                purpose: '{{ purpose_name }}',
+                parameters: {
+                    embedding_dim: document.getElementById('embedding_dim').value,
+                    hidden_dim: document.getElementById('hidden_dim').value,
+                    num_layers: document.getElementById('num_layers').value,
+                    dropout: document.getElementById('dropout').value,
+                    activation: document.getElementById('activation').value,
+                    walk_length: document.getElementById('walk_length').value,
+                    num_walks: document.getElementById('num_walks').value,
+                    p: document.getElementById('p').value,
+                    q: document.getElementById('q').value,
+                    window_size: document.getElementById('window_size').value,
+                    negative_samples: document.getElementById('negative_samples').value,
+                    learning_rate: document.getElementById('learning_rate').value,
+                    epochs: document.getElementById('epochs').value,
+                    batch_size: document.getElementById('batch_size').value,
+                    weight_decay: document.getElementById('weight_decay').value,
+                    scheduler: document.getElementById('scheduler').value,
+                    patience: document.getElementById('patience').value,
+                    visualization_method: document.getElementById('visualization_method').value,
+                    perplexity: document.getElementById('perplexity').value,
+                    n_neighbors: document.getElementById('n_neighbors').value,
+                    min_dist: document.getElementById('min_dist').value,
+                    clustering_method: document.getElementById('clustering_method').value,
+                    n_clusters: document.getElementById('n_clusters').value,
+                    validation_split: document.getElementById('validation_split').value,
+                    test_split: document.getElementById('test_split').value
+                },
+                metrics: {
+                    clustering_score: parseFloat(document.getElementById('clusteringScore').textContent) || 0,
+                    silhouette_score: parseFloat(document.getElementById('silhouetteScore').textContent) || 0,
+                    loss: parseFloat(document.getElementById('currentLoss').textContent) || 0
+                }
+            };
+            
+            // Generate experiment ID
+            const experimentId = `exp_${Date.now()}`;
+            
+            // Call backend API to save model
+            const response = await fetch(`/purpose/{{ purpose_name }}/api/save_model/${experimentId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(experimentData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                showNotification(`Model saved successfully! Path: ${result.model_path}`, 'success');
+                
+                // Store experiment ID for later use
+                localStorage.setItem('current_experiment_id', experimentId);
+            } else {
+                const error = await response.json();
+                showNotification(`Failed to save model: ${error.detail}`, 'error');
+            }
+        } catch (error) {
+            showNotification(`Error saving model: ${error.message}`, 'error');
+        }
+    });
+    
+    document.getElementById('viewResults').addEventListener('click', async function() {
+        try {
+            // Get current experiment ID
+            const experimentId = localStorage.getItem('current_experiment_id') || `exp_${Date.now()}`;
+            
+            // Navigate to results page
+            window.location.href = `/purpose/{{ purpose_name }}/results/${experimentId}`;
+        } catch (error) {
+            showNotification(`Error viewing results: ${error.message}`, 'error');
+        }
+    });
+    
+    document.getElementById('exportConfig').addEventListener('click', async function() {
+        try {
+            // Get current experiment ID
+            const experimentId = localStorage.getItem('current_experiment_id') || `exp_${Date.now()}`;
+            
+            // Prepare config data
+            const configData = {
+                model_name: '{{ model_id }}',
+                purpose: '{{ purpose_name }}',
+                parameters: {
+                    embedding_dim: document.getElementById('embedding_dim').value,
+                    hidden_dim: document.getElementById('hidden_dim').value,
+                    num_layers: document.getElementById('num_layers').value,
+                    dropout: document.getElementById('dropout').value,
+                    activation: document.getElementById('activation').value,
+                    walk_length: document.getElementById('walk_length').value,
+                    num_walks: document.getElementById('num_walks').value,
+                    p: document.getElementById('p').value,
+                    q: document.getElementById('q').value,
+                    window_size: document.getElementById('window_size').value,
+                    negative_samples: document.getElementById('negative_samples').value,
+                    learning_rate: document.getElementById('learning_rate').value,
+                    epochs: document.getElementById('epochs').value,
+                    batch_size: document.getElementById('batch_size').value,
+                    weight_decay: document.getElementById('weight_decay').value,
+                    scheduler: document.getElementById('scheduler').value,
+                    patience: document.getElementById('patience').value,
+                    visualization_method: document.getElementById('visualization_method').value,
+                    perplexity: document.getElementById('perplexity').value,
+                    n_neighbors: document.getElementById('n_neighbors').value,
+                    min_dist: document.getElementById('min_dist').value,
+                    clustering_method: document.getElementById('clustering_method').value,
+                    n_clusters: document.getElementById('n_clusters').value,
+                    validation_split: document.getElementById('validation_split').value,
+                    test_split: document.getElementById('test_split').value
+                },
+                description: `Configuration for {{ model_id }} model on {{ purpose_name }} task`
+            };
+            
+            // Call backend API to export config
+            const response = await fetch(`/purpose/{{ purpose_name }}/api/export_config/${experimentId}`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(configData)
+            });
+            
+            if (response.ok) {
+                const result = await response.json();
+                showNotification(`Configuration exported successfully! Path: ${result.config_path}`, 'success');
+                
+                // Also download the config file
+                const config = {
+                    model: '{{ model_id }}',
+                    purpose: '{{ purpose_name }}',
+                    parameters: configData.parameters,
+                    timestamp: new Date().toISOString(),
+                    description: configData.description
+                };
+                
+                const blob = new Blob([JSON.stringify(config, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `gnn_config_{{ model_id }}_{experimentId}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
+            } else {
+                const error = await response.json();
+                showNotification(`Failed to export config: ${error.detail}`, 'error');
+            }
+        } catch (error) {
+            showNotification(`Error exporting config: ${error.message}`, 'error');
+        }
+    });
 });
 </script>
 {% endblock %}

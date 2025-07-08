@@ -11,7 +11,7 @@ from .graph_regression import GRAPH_REGRESSION_TASK, TASK_METADATA as GRAPH_REGR
 from .anomaly_detection import ANOMALY_DETECTION_TASK, TASK_METADATA as ANOMALY_DETECTION_METADATA
 from .dynamic_graph_learning import DYNAMIC_GRAPH_LEARNING_TASK, TASK_METADATA as DYNAMIC_GRAPH_LEARNING_METADATA
 from .graph_generation import GRAPH_GENERATION_TASK, TASK_METADATA as GRAPH_GENERATION_METADATA
-from .graph_embedding import GRAPH_EMBEDDING_TASK, TASK_METADATA as GRAPH_EMBEDDING_METADATA
+from .graph_embedding_visualization import GRAPH_EMBEDDING_VISUALIZATION_TASK, TASK_METADATA as GRAPH_EMBEDDING_VISUALIZATION_METADATA
 from .edge_classification import EDGE_CLASSIFICATION_TASK, TASK_METADATA as EDGE_CLASSIFICATION_METADATA
 from .graph_classification import GRAPH_CLASSIFICATION_TASK, TASK_METADATA as GRAPH_CLASSIFICATION_METADATA
 from .community_detection import COMMUNITY_DETECTION_TASK, TASK_METADATA as COMMUNITY_DETECTION_METADATA
@@ -28,7 +28,7 @@ TASK_REGISTRY = {
     'anomaly_detection': ANOMALY_DETECTION_TASK,
     'dynamic_graph_learning': DYNAMIC_GRAPH_LEARNING_TASK,
     'graph_generation': GRAPH_GENERATION_TASK,
-    'graph_embedding': GRAPH_EMBEDDING_TASK,
+    'graph_embedding_visualization': GRAPH_EMBEDDING_VISUALIZATION_TASK,
     'edge_classification': EDGE_CLASSIFICATION_TASK,
     'graph_classification': GRAPH_CLASSIFICATION_TASK,
     'community_detection': COMMUNITY_DETECTION_TASK,
@@ -43,7 +43,7 @@ TASK_METADATA_REGISTRY = {
     'anomaly_detection': ANOMALY_DETECTION_METADATA,
     'dynamic_graph_learning': DYNAMIC_GRAPH_LEARNING_METADATA,
     'graph_generation': GRAPH_GENERATION_METADATA,
-    'graph_embedding': GRAPH_EMBEDDING_METADATA,
+    'graph_embedding_visualization': GRAPH_EMBEDDING_VISUALIZATION_METADATA,
     'edge_classification': EDGE_CLASSIFICATION_METADATA,
     'graph_classification': GRAPH_CLASSIFICATION_METADATA,
     'community_detection': COMMUNITY_DETECTION_METADATA,
@@ -98,7 +98,7 @@ TASK_CATEGORIES = {
         'description': 'Tasks for learning graph embeddings',
         'icon': 'fas fa-eye',
         'color': 'secondary',
-        'tasks': ['graph_embedding']
+        'tasks': ['graph_embedding_visualization']
     },
     'dynamic': {
         'name': 'Dynamic Graph Learning',

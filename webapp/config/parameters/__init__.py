@@ -36,7 +36,7 @@ graph_regression_params, graph_regression_defaults = safe_import_parameters('gra
 community_detection_params, community_detection_defaults = safe_import_parameters('community_detection')
 anomaly_detection_params, anomaly_detection_defaults = safe_import_parameters('anomaly_detection')
 graph_generation_params, graph_generation_defaults = safe_import_parameters('graph_generation')
-graph_embedding_params, graph_embedding_defaults = safe_import_parameters('graph_embedding')
+graph_embedding_visualization_params, graph_embedding_visualization_defaults = safe_import_parameters('graph_embedding_visualization')
 dynamic_graph_learning_params, dynamic_graph_learning_defaults = safe_import_parameters('dynamic_graph_learning')
 
 # Parameter registry
@@ -50,7 +50,7 @@ PARAMETER_REGISTRY = {
     'community_detection': community_detection_params,
     'anomaly_detection': anomaly_detection_params,
     'graph_generation': graph_generation_params,
-    'graph_embedding': graph_embedding_params,
+    'graph_embedding_visualization': graph_embedding_visualization_params,
     'dynamic_graph_learning': dynamic_graph_learning_params,
 }
 
@@ -65,7 +65,7 @@ DEFAULT_PARAMETERS_REGISTRY = {
     'community_detection': community_detection_defaults,
     'anomaly_detection': anomaly_detection_defaults,
     'graph_generation': graph_generation_defaults,
-    'graph_embedding': graph_embedding_defaults,
+    'graph_embedding_visualization': graph_embedding_visualization_defaults,
     'dynamic_graph_learning': dynamic_graph_learning_defaults,
 }
 

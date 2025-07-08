@@ -8,7 +8,7 @@
         background: white;
         border-radius: 12px;
         padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     
@@ -43,14 +43,14 @@
         color: white;
         border-radius: 12px;
         padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
     }
     
-    .progress-section {
+    .live-monitor {
         background: white;
         border-radius: 12px;
         padding: 2rem;
-        margin-bottom: 2rem;
+        margin-bottom: 1.5rem;
         box-shadow: 0 5px 15px rgba(0,0,0,0.1);
     }
     
@@ -71,6 +71,32 @@
         border-radius: 8px;
         padding: 1rem;
         margin-bottom: 1rem;
+    }
+    
+    .metrics-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+        gap: 1rem;
+        margin-bottom: 1.5rem;
+    }
+    
+    .metric-card {
+        background: #f8f9fa;
+        border-radius: 8px;
+        padding: 1rem;
+        text-align: center;
+    }
+    
+    .metric-value {
+        font-size: 1.5rem;
+        font-weight: bold;
+        color: var(--primary);
+    }
+    
+    .metric-label {
+        font-size: 0.875rem;
+        color: #6c757d;
+        margin-top: 0.25rem;
     }
 </style>
 {% endblock %}
@@ -98,8 +124,8 @@
     </div>
 
     <div class="row">
-        <!-- Left Column - Parameters and Controls -->
-        <div class="col-lg-8">
+        <!-- Main Content - Parameters -->
+        <div class="col-12">
             <!-- Model Information -->
             <div class="parameter-section">
                 <h4><i class="fas fa-info-circle"></i> Model Information</h4>
@@ -309,125 +335,95 @@
             <div class="training-controls">
                 <h4><i class="fas fa-play-circle"></i> Training Controls</h4>
                 <div class="row">
-                    <div class="col-md-6">
-                        <button type="button" class="btn btn-light btn-lg w-100 mb-3" id="startTraining">
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-success btn-lg w-100 mb-3" id="startTraining">
                             <i class="fas fa-play"></i> Start Training
                         </button>
                     </div>
-                    <div class="col-md-6">
-                        <button type="button" class="btn btn-outline-light btn-lg w-100 mb-3" id="stopTraining" disabled>
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-danger btn-lg w-100 mb-3" id="stopTraining" disabled>
                             <i class="fas fa-stop"></i> Stop Training
                         </button>
                     </div>
-                </div>
-                <div class="row">
-                    <div class="col-12">
-                        <button type="button" class="btn btn-outline-light w-100" id="resetTraining">
+                    <div class="col-md-4">
+                        <button type="button" class="btn btn-warning btn-lg w-100 mb-3" id="resetTraining">
                             <i class="fas fa-redo"></i> Reset Training
                         </button>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- Right Column - Progress and Results -->
-        <div class="col-lg-4">
-            <!-- Training Progress -->
-            <div class="progress-section">
-                <h4><i class="fas fa-chart-line"></i> Training Progress</h4>
-                <div id="trainingProgress" style="display: none;">
-                    <div class="mb-3">
-                        <label class="form-label">Epoch Progress</label>
-                        <div class="progress mb-2">
-                            <div class="progress-bar" id="epochProgress" role="progressbar" style="width: 0%"></div>
-                        </div>
-                        <small class="text-muted" id="epochText">0 / 0 epochs</small>
+            <!-- Live Training Monitor -->
+            <div class="live-monitor" id="liveMonitor" style="display: none;">
+                <h4><i class="fas fa-chart-line"></i> Live Training Monitor</h4>
+                
+                <!-- Training Progress -->
+                <div class="mb-4">
+                    <label class="form-label">Epoch Progress</label>
+                    <div class="progress mb-2">
+                        <div class="progress-bar" id="epochProgress" role="progressbar" style="width: 0%"></div>
                     </div>
-                    <div class="mb-3">
-                        <label class="form-label">Overall Progress</label>
-                        <div class="progress mb-2">
-                            <div class="progress-bar bg-success" id="overallProgress" role="progressbar" style="width: 0%"></div>
-                        </div>
-                        <small class="text-muted" id="overallText">0% complete</small>
+                    <small class="text-muted" id="epochText">0 / 0 epochs</small>
+                </div>
+
+                <!-- Live Metrics -->
+                <div class="metrics-grid">
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentLoss">-</div>
+                        <div class="metric-label">Training Loss</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentMSE">-</div>
+                        <div class="metric-label">MSE</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="validationLoss">-</div>
+                        <div class="metric-label">Validation Loss</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="validationMSE">-</div>
+                        <div class="metric-label">Val MSE</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentMAE">-</div>
+                        <div class="metric-label">MAE</div>
+                    </div>
+                    <div class="metric-card">
+                        <div class="metric-value" id="currentR2">-</div>
+                        <div class="metric-label">R² Score</div>
                     </div>
                 </div>
-                <div id="trainingStatus" class="text-center">
-                    <i class="fas fa-clock fa-3x text-muted mb-3"></i>
-                    <p class="text-muted">Ready to start training</p>
-                </div>
-            </div>
 
-            <!-- Live Metrics -->
-            <div class="progress-section">
-                <h4><i class="fas fa-tachometer-alt"></i> Live Metrics</h4>
+                <!-- Training Charts -->
                 <div class="row">
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h5 id="currentLoss">-</h5>
-                            <small class="text-muted">Training Loss</small>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="lossChart"></canvas>
                         </div>
                     </div>
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h5 id="currentMSE">-</h5>
-                            <small class="text-muted">MSE</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="row mt-3">
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h5 id="validationLoss">-</h5>
-                            <small class="text-muted">Validation Loss</small>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h5 id="validationMSE">-</h5>
-                            <small class="text-muted">Val MSE</small>
+                    <div class="col-md-6">
+                        <div class="chart-container">
+                            <canvas id="mseChart"></canvas>
                         </div>
                     </div>
                 </div>
-                <div class="row mt-3">
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h5 id="currentMAE">-</h5>
-                            <small class="text-muted">MAE</small>
-                        </div>
-                    </div>
-                    <div class="col-6">
-                        <div class="text-center">
-                            <h5 id="currentR2">-</h5>
-                            <small class="text-muted">R² Score</small>
-                        </div>
-                    </div>
-                </div>
-            </div>
 
-            <!-- Training Charts -->
-            <div class="progress-section">
-                <h4><i class="fas fa-chart-area"></i> Training Curves</h4>
-                <div class="chart-container">
-                    <canvas id="lossChart"></canvas>
-                </div>
-                <div class="chart-container">
-                    <canvas id="mseChart"></canvas>
-                </div>
-            </div>
-
-            <!-- Quick Actions -->
-            <div class="progress-section">
-                <h4><i class="fas fa-bolt"></i> Quick Actions</h4>
-                <div class="d-grid gap-2">
-                    <button type="button" class="btn btn-outline-primary" id="saveModel">
-                        <i class="fas fa-save"></i> Save Model
-                    </button>
-                    <button type="button" class="btn btn-outline-success" id="viewResults">
-                        <i class="fas fa-chart-bar"></i> View Results
-                    </button>
-                    <button type="button" class="btn btn-outline-info" id="exportConfig">
-                        <i class="fas fa-download"></i> Export Config
-                    </button>
+                <!-- Quick Actions -->
+                <div class="row mt-4">
+                    <div class="col-12">
+                        <h5><i class="fas fa-bolt"></i> Quick Actions</h5>
+                        <div class="d-flex gap-2 flex-wrap">
+                            <button type="button" class="btn btn-outline-primary" id="saveModel">
+                                <i class="fas fa-save"></i> Save Model
+                            </button>
+                            <button type="button" class="btn btn-outline-success" id="viewResults">
+                                <i class="fas fa-chart-bar"></i> View Results
+                            </button>
+                            <button type="button" class="btn btn-outline-info" id="exportConfig">
+                                <i class="fas fa-download"></i> Export Config
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -558,8 +554,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Update UI
         document.getElementById('startTraining').disabled = true;
         document.getElementById('stopTraining').disabled = false;
-        document.getElementById('trainingProgress').style.display = 'block';
-        document.getElementById('trainingStatus').style.display = 'none';
+        document.getElementById('liveMonitor').style.display = 'block';
         
         // Simulate training
         trainingInterval = setInterval(() => {
@@ -599,13 +594,12 @@ document.addEventListener('DOMContentLoaded', function() {
             
             // Check if training is complete
             if (currentEpoch >= totalEpochs) {
-                stopTraining();
-                showNotification('Training completed successfully!', 'success');
+                stopTraining(true); // true indicates natural completion
             }
         }, 100); // Update every 100ms for smooth animation
     }
     
-    function stopTraining() {
+    function stopTraining(isCompleted = false, isReset = false) {
         isTraining = false;
         clearInterval(trainingInterval);
         
@@ -613,11 +607,18 @@ document.addEventListener('DOMContentLoaded', function() {
         document.getElementById('startTraining').disabled = false;
         document.getElementById('stopTraining').disabled = true;
         
-        showNotification('Training stopped', 'warning');
+        // Show appropriate notification
+        if (isReset) {
+            showNotification('Training reset', 'info');
+        } else if (isCompleted) {
+            showNotification('Training completed successfully!', 'success');
+        } else {
+            showNotification('Training stopped', 'warning');
+        }
     }
     
     function resetTraining() {
-        stopTraining();
+        stopTraining(false, true); // Pass isReset = true
         
         // Reset charts
         lossChart.data.labels = [];
@@ -633,16 +634,15 @@ document.addEventListener('DOMContentLoaded', function() {
         // Reset progress
         document.getElementById('epochProgress').style.width = '0%';
         document.getElementById('epochText').textContent = '0 / 0 epochs';
-        document.getElementById('trainingProgress').style.display = 'none';
-        document.getElementById('trainingStatus').style.display = 'block';
+        document.getElementById('liveMonitor').style.display = 'none';
         
         // Reset metrics
         document.getElementById('currentLoss').textContent = '-';
         document.getElementById('currentMSE').textContent = '-';
         document.getElementById('validationLoss').textContent = '-';
         document.getElementById('validationMSE').textContent = '-';
-        document.getElementById('currentMAE').textContent = '-';
         document.getElementById('currentR2').textContent = '-';
+        document.getElementById('validationR2').textContent = '-';
     }
     
     function showNotification(message, type = 'info') {
@@ -659,7 +659,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     document.getElementById('viewResults').addEventListener('click', function() {
-        window.location.href = `/purpose/${purpose_name}/results/${model_id}`;
+        window.location.href = `/purpose/{{ purpose_name }}/results/${model_id}`;
     });
     
     document.getElementById('exportConfig').addEventListener('click', function() {

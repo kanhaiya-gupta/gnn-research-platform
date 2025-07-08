@@ -12,10 +12,12 @@ GNN_MODELS = {
         'name': 'Graph Convolutional Network',
         'description': 'Spectral-based graph convolution using Chebyshev polynomials',
         'paper': 'Kipf & Welling, ICLR 2017',
+        'formula': 'H^{(l+1)} = σ(D̃^(-1/2)ÃD̃^(-1/2)H^{(l)}W^{(l)})',
+        'applications': ['Citation Networks', 'Social Networks', 'Knowledge Graphs', 'Molecular Graphs', 'Recommendation Systems'],
         'category': 'convolutional',
         'architecture': 'spectral',
         'inductive': False,
-        'supported_tasks': ['node_classification', 'node_regression', 'link_prediction', 'edge_classification', 'graph_classification', 'graph_regression', 'community_detection'],
+        'supported_tasks': ['node_classification', 'node_regression', 'link_prediction', 'edge_classification', 'graph_classification', 'graph_regression', 'community_detection', 'graph_embedding_visualization'],
         
         # Model-specific parameters
         'parameters': {
@@ -41,10 +43,12 @@ GNN_MODELS = {
         'name': 'Graph Attention Network',
         'description': 'Attention-based graph convolution with multi-head attention',
         'paper': 'Veličković et al., ICLR 2018',
+        'formula': 'α_{ij} = softmax(LeakyReLU(a^T[Wh_i || Wh_j]))',
+        'applications': ['Protein Interaction Networks', 'Social Networks', 'Knowledge Graphs', 'Molecular Property Prediction', 'Recommendation Systems'],
         'category': 'attention',
         'architecture': 'attention',
         'inductive': False,
-        'supported_tasks': ['node_classification', 'node_regression', 'link_prediction', 'edge_classification', 'graph_classification', 'graph_regression', 'community_detection'],
+        'supported_tasks': ['node_classification', 'node_regression', 'link_prediction', 'edge_classification', 'graph_classification', 'graph_regression', 'community_detection', 'graph_embedding_visualization'],
         
         # Model-specific parameters
         'parameters': {
@@ -71,10 +75,12 @@ GNN_MODELS = {
         'name': 'GraphSAGE',
         'description': 'Inductive graph representation learning with neighbor sampling',
         'paper': 'Hamilton et al., NeurIPS 2017',
+        'formula': 'h_v^{(k)} = σ(W^{(k)} · CONCAT(h_v^{(k-1)}, AGG({h_u^{(k-1)}, ∀u ∈ N(v)})))',
+        'applications': ['Large-Scale Social Networks', 'E-commerce Networks', 'Citation Networks', 'Biological Networks', 'Fraud Detection'],
         'category': 'inductive',
         'architecture': 'spatial',
         'inductive': True,
-        'supported_tasks': ['node_classification', 'node_regression', 'link_prediction', 'edge_classification', 'graph_classification', 'graph_regression', 'community_detection'],
+        'supported_tasks': ['node_classification', 'node_regression', 'link_prediction', 'edge_classification', 'graph_classification', 'graph_regression', 'community_detection', 'graph_embedding_visualization'],
         
         # Model-specific parameters
         'parameters': {
@@ -100,10 +106,12 @@ GNN_MODELS = {
         'name': 'Graph Isomorphism Network',
         'description': 'Graph isomorphism network with injective aggregation',
         'paper': 'Xu et al., ICLR 2019',
+        'formula': 'h_v^{(k)} = MLP^{(k)}((1 + ε^{(k)}) · h_v^{(k-1)} + Σ_{u∈N(v)} h_u^{(k-1)})',
+        'applications': ['Molecular Property Prediction', 'Drug Discovery', 'Chemical Networks', 'Graph Classification', 'Bioinformatics'],
         'category': 'convolutional',
         'architecture': 'spatial',
         'inductive': True,
-        'supported_tasks': ['node_classification', 'node_regression', 'graph_classification', 'graph_regression', 'community_detection'],
+        'supported_tasks': ['node_classification', 'node_regression', 'graph_classification', 'graph_regression', 'community_detection', 'graph_embedding_visualization'],
         
         # Model-specific parameters
         'parameters': {
@@ -129,10 +137,12 @@ GNN_MODELS = {
         'name': 'Chebyshev Graph Convolution',
         'description': 'Spectral graph convolution using Chebyshev polynomials',
         'paper': 'Defferrard et al., NeurIPS 2016',
+        'formula': 'g_θ(L) = Σ_{k=0}^{K-1} θ_k T_k(L̃)',
+        'applications': ['Spectral Graph Analysis', 'Signal Processing on Graphs', 'Computer Vision', '3D Shape Analysis', 'Spectral Clustering'],
         'category': 'convolutional',
         'architecture': 'spectral',
         'inductive': False,
-        'supported_tasks': ['node_classification', 'node_regression', 'link_prediction', 'edge_classification', 'graph_classification', 'community_detection'],
+        'supported_tasks': ['node_classification', 'node_regression', 'link_prediction', 'edge_classification', 'graph_classification', 'community_detection', 'graph_embedding_visualization'],
         
         # Model-specific parameters
         'parameters': {
@@ -157,6 +167,8 @@ GNN_MODELS = {
         'name': 'Variational Graph Autoencoder',
         'description': 'Variational autoencoder for graph generation and link prediction',
         'paper': 'Kipf & Welling, ICLR 2016',
+        'formula': 'q(Z|X,A) = Π_{i=1}^N q(z_i|X,A), q(z_i|X,A) = N(z_i|μ_i, diag(σ_i²))',
+        'applications': ['Graph Generation', 'Link Prediction', 'Graph Completion', 'Network Reconstruction', 'Anomaly Detection'],
         'category': 'generative',
         'architecture': 'autoencoder',
         'inductive': False,
@@ -182,10 +194,138 @@ GNN_MODELS = {
         }
     },
     
+    'node2vec': {
+        'name': 'Node2Vec',
+        'description': 'Scalable feature learning for networks using biased random walks',
+        'paper': 'Grover & Leskovec, KDD 2016',
+        'formula': 'P(c_i = x | c_{i-1} = v) = π_{vx}/Z, π_{vx} = α_{pq}(t,x) · w_{vx}',
+        'applications': ['Social Network Analysis', 'Recommendation Systems', 'Community Detection', 'Link Prediction', 'Node Classification'],
+        'category': 'embedding',
+        'architecture': 'random_walk',
+        'inductive': False,
+        'supported_tasks': ['graph_embedding_visualization'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'embedding_dim': {'default': 64, 'range': [16, 512]},
+            'walk_length': {'default': 80, 'range': [10, 200]},
+            'num_walks': {'default': 10, 'range': [1, 50]},
+            'p': {'default': 1.0, 'range': [0.1, 10.0]},
+            'q': {'default': 1.0, 'range': [0.1, 10.0]},
+            'window_size': {'default': 10, 'range': [1, 20]},
+            'negative_samples': {'default': 5, 'range': [1, 20]},
+            'learning_rate': {'default': 0.01, 'range': [0.001, 0.1]},
+            'epochs': {'default': 100, 'range': [10, 1000]}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'networkx',
+            'class': 'Node2Vec',
+            'optimization': 'biased_walks',
+            'memory_efficient': True
+        }
+    },
+    
+    'deepwalk': {
+        'name': 'DeepWalk',
+        'description': 'Social representation learning using truncated random walks',
+        'paper': 'Perozzi et al., KDD 2014',
+        'formula': 'P(c_i = x | c_{i-1} = v) = softmax(W_c · h_v)',
+        'applications': ['Social Network Analysis', 'Community Detection', 'Link Prediction', 'Node Classification', 'Network Visualization'],
+        'category': 'embedding',
+        'architecture': 'random_walk',
+        'inductive': False,
+        'supported_tasks': ['graph_embedding_visualization'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'embedding_dim': {'default': 64, 'range': [16, 512]},
+            'walk_length': {'default': 80, 'range': [10, 200]},
+            'num_walks': {'default': 10, 'range': [1, 50]},
+            'window_size': {'default': 10, 'range': [1, 20]},
+            'negative_samples': {'default': 5, 'range': [1, 20]},
+            'learning_rate': {'default': 0.01, 'range': [0.001, 0.1]},
+            'epochs': {'default': 100, 'range': [10, 1000]}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'networkx',
+            'class': 'DeepWalk',
+            'optimization': 'random_walks',
+            'memory_efficient': True
+        }
+    },
+    
+    'line': {
+        'name': 'LINE',
+        'description': 'Large-scale information network embedding preserving first and second-order proximities',
+        'paper': 'Tang et al., WWW 2015',
+        'formula': 'p_1(v_i, v_j) = 1/(1 + exp(-u_i^T u_j)), p_2(v_j|v_i) = exp(u_j^T u_i)/Σ_k exp(u_k^T u_i)',
+        'applications': ['Large-Scale Networks', 'Social Networks', 'Citation Networks', 'Co-occurrence Networks', 'Knowledge Graphs'],
+        'category': 'embedding',
+        'architecture': 'proximity',
+        'inductive': False,
+        'supported_tasks': ['graph_embedding_visualization'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'embedding_dim': {'default': 64, 'range': [16, 512]},
+            'order': {'default': 2, 'range': [1, 2]},
+            'negative_samples': {'default': 5, 'range': [1, 20]},
+            'learning_rate': {'default': 0.01, 'range': [0.001, 0.1]},
+            'epochs': {'default': 100, 'range': [10, 1000]},
+            'batch_size': {'default': 256, 'range': [32, 2048]}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'networkx',
+            'class': 'LINE',
+            'optimization': 'proximity',
+            'memory_efficient': True
+        }
+    },
+    
+    'sdne': {
+        'name': 'SDNE',
+        'description': 'Structural Deep Network Embedding for large-scale networks',
+        'paper': 'Wang et al., KDD 2016',
+        'formula': 'L = L_2nd + αL_1st + νL_reg, L_2nd = ||(X̂ - X) ⊙ B||_F^2',
+        'applications': ['Large-Scale Networks', 'Social Networks', 'Citation Networks', 'Protein Networks', 'Recommendation Systems'],
+        'category': 'embedding',
+        'architecture': 'autoencoder',
+        'inductive': False,
+        'supported_tasks': ['graph_embedding_visualization'],
+        
+        # Model-specific parameters
+        'parameters': {
+            'embedding_dim': {'default': 64, 'range': [16, 512]},
+            'hidden_dim': {'default': 128, 'range': [32, 1024]},
+            'alpha': {'default': 1.0, 'range': [0.1, 10.0]},
+            'beta': {'default': 1.0, 'range': [0.1, 10.0]},
+            'nu': {'default': 1e-5, 'range': [1e-6, 1e-3]},
+            'learning_rate': {'default': 0.001, 'range': [0.0001, 0.1]},
+            'epochs': {'default': 100, 'range': [10, 1000]},
+            'batch_size': {'default': 256, 'range': [32, 2048]}
+        },
+        
+        # Implementation details
+        'implementation': {
+            'framework': 'pytorch',
+            'class': 'SDNE',
+            'optimization': 'autoencoder',
+            'memory_efficient': False
+        }
+    },
+    
     'seal': {
         'name': 'SEAL',
         'description': 'Subgraphs, Embeddings and Attributes for Link prediction',
         'paper': 'Zhang & Chen, NeurIPS 2018',
+        'formula': 'f(A, X) = MLP([h_i^{(L)} || h_j^{(L)} || h_{i,j}^{(L)}])',
+        'applications': ['Link Prediction', 'Network Completion', 'Social Network Analysis', 'Knowledge Graph Completion', 'Recommendation Systems'],
         'category': 'link_prediction',
         'architecture': 'subgraph',
         'inductive': True,
@@ -215,6 +355,8 @@ GNN_MODELS = {
         'name': 'Simple Graph Convolution',
         'description': 'Simple graph convolution with pre-computed features',
         'paper': 'Wu et al., ICML 2019',
+        'formula': 'H^{(k)} = S^k X W^{(k)}',
+        'applications': ['Large-Scale Networks', 'Citation Networks', 'Social Networks', 'Fast Node Classification', 'Pre-computed Features'],
         'category': 'convolutional',
         'architecture': 'spectral',
         'inductive': False,
@@ -243,6 +385,8 @@ GNN_MODELS = {
         'name': 'APPNP',
         'description': 'Approximate Personalized Propagation of Neural Predictions',
         'paper': 'Klicpera et al., ICLR 2019',
+        'formula': 'H^{(k)} = (1-α) · ÃH^{(k-1)} + α · H^{(0)}',
+        'applications': ['Semi-supervised Learning', 'Node Classification', 'Personalized PageRank', 'Graph Neural Networks', 'Large-scale Networks'],
         'category': 'propagation',
         'architecture': 'message_passing',
         'inductive': False,
@@ -272,6 +416,8 @@ GNN_MODELS = {
         'name': 'DiffPool',
         'description': 'Differentiable graph pooling with hierarchical clustering',
         'paper': 'Ying et al., NeurIPS 2018',
+        'formula': 'S^{(l)} = softmax(GNN_{pool}^{(l)}(A^{(l)}, X^{(l)}))',
+        'applications': ['Graph Classification', 'Molecular Property Prediction', 'Hierarchical Graph Representation', 'Graph Pooling', 'Bioinformatics'],
         'category': 'pooling',
         'architecture': 'hierarchical',
         'inductive': False,
@@ -301,6 +447,8 @@ GNN_MODELS = {
         'name': 'SortPool',
         'description': 'SortPooling for graph neural networks',
         'paper': 'Zhang et al., AAAI 2018',
+        'formula': 'y = CONV1D(sort(h_1, h_2, ..., h_n)[:k])',
+        'applications': ['Graph Classification', 'Graph Regression', 'Molecular Property Prediction', 'Graph Pooling', 'Fixed-size Representations'],
         'category': 'pooling',
         'architecture': 'sorting',
         'inductive': False,
@@ -329,6 +477,8 @@ GNN_MODELS = {
         'name': 'GCN Autoencoder',
         'description': 'Graph Convolutional Network with Autoencoder for anomaly detection',
         'paper': 'Various papers on GCN autoencoders',
+        'formula': 'L = ||X - X̂||² + λ||Z||²',
+        'applications': ['Anomaly Detection', 'Fraud Detection', 'Network Security', 'Outlier Detection', 'Graph Reconstruction'],
         'category': 'anomaly_detection',
         'architecture': 'autoencoder',
         'inductive': False,
@@ -358,6 +508,8 @@ GNN_MODELS = {
         'name': 'GAT Autoencoder',
         'description': 'Graph Attention Network with Autoencoder for anomaly detection',
         'paper': 'Various papers on GAT autoencoders',
+        'formula': 'L = ||X - X̂||² + λ||Z||² + βKL(q(Z|X)||p(Z))',
+        'applications': ['Anomaly Detection', 'Attention-based Reconstruction', 'Network Security', 'Fraud Detection', 'Graph Attention'],
         'category': 'anomaly_detection',
         'architecture': 'attention_autoencoder',
         'inductive': False,
@@ -388,6 +540,8 @@ GNN_MODELS = {
         'name': 'DOMINANT',
         'description': 'Deep Anomaly Detection on Attributed Networks',
         'paper': 'Ding et al., WSDM 2019',
+        'formula': 'L = αL_{attr} + βL_{struct} + γL_{reg}',
+        'applications': ['Anomaly Detection', 'Fraud Detection', 'Network Security', 'Attributed Networks', 'Deep Learning'],
         'category': 'anomaly_detection',
         'architecture': 'reconstruction',
         'inductive': False,
@@ -418,6 +572,8 @@ GNN_MODELS = {
         'name': 'AnomalyDAE',
         'description': 'Anomaly Detection on Attributed Networks via Variational Graph Autoencoder',
         'paper': 'Fan et al., KDD 2020',
+        'formula': 'L = L_{recon} + βKL(q(Z|X,A)||p(Z))',
+        'applications': ['Anomaly Detection', 'Variational Autoencoders', 'Attributed Networks', 'Graph Generation', 'Network Security'],
         'category': 'anomaly_detection',
         'architecture': 'variational_autoencoder',
         'inductive': False,
@@ -448,6 +604,8 @@ GNN_MODELS = {
         'name': 'GAnomaly',
         'description': 'Generative Adversarial Network for Anomaly Detection',
         'paper': 'Various papers on GAN-based anomaly detection',
+        'formula': 'L = L_{adv} + λL_{recon} + γL_{feature}',
+        'applications': ['Anomaly Detection', 'Generative Adversarial Networks', 'Fraud Detection', 'Network Security', 'Graph Generation'],
         'category': 'anomaly_detection',
         'architecture': 'generative_adversarial',
         'inductive': False,
@@ -478,6 +636,8 @@ GNN_MODELS = {
         'name': 'GraphSAGE Autoencoder',
         'description': 'GraphSAGE with Autoencoder for anomaly detection',
         'paper': 'Various papers on GraphSAGE autoencoders',
+        'formula': 'L = ||X - X̂||² + λ||Z||² + μL_{sage}',
+        'applications': ['Anomaly Detection', 'Inductive Learning', 'Large-scale Networks', 'GraphSAGE', 'Autoencoder'],
         'category': 'anomaly_detection',
         'architecture': 'inductive_autoencoder',
         'inductive': True,
@@ -508,6 +668,8 @@ GNN_MODELS = {
         'name': 'DySAT',
         'description': 'Dynamic Self-Attention Network for Dynamic Graph Embedding',
         'paper': 'Sankar et al., WSDM 2020',
+        'formula': 'h_v^{(t)} = MultiHead(Q_v^{(t)}, K_v^{(t)}, V_v^{(t)})',
+        'applications': ['Dynamic Graph Learning', 'Temporal Networks', 'Social Network Evolution', 'Time-series Graphs', 'Temporal Embeddings'],
         'category': 'dynamic_graph',
         'architecture': 'temporal_attention',
         'inductive': False,
@@ -537,6 +699,8 @@ GNN_MODELS = {
         'name': 'Temporal Graph Attention Network',
         'description': 'Temporal Graph Attention Network for Dynamic Graph Learning',
         'paper': 'Xu et al., ICLR 2020',
+        'formula': 'α_{ij}^{(t)} = softmax(LeakyReLU(a^T[Wh_i^{(t)} || Wh_j^{(t)} || Φ(t-t_{ij})]))',
+        'applications': ['Dynamic Graph Learning', 'Temporal Attention', 'Time-evolving Networks', 'Temporal Link Prediction', 'Dynamic Embeddings'],
         'category': 'dynamic_graph',
         'architecture': 'temporal_attention',
         'inductive': False,
@@ -566,6 +730,8 @@ GNN_MODELS = {
         'name': 'EvolveGCN',
         'description': 'Evolving Graph Convolutional Networks for Dynamic Graph Learning',
         'paper': 'Pareja et al., NeurIPS 2020',
+        'formula': 'W^{(t)} = GRU(W^{(t-1)}, ΔW^{(t)})',
+        'applications': ['Dynamic Graph Learning', 'Evolving Networks', 'Temporal GCN', 'Network Evolution', 'Dynamic Convolution'],
         'category': 'dynamic_graph',
         'architecture': 'evolving_convolution',
         'inductive': False,
@@ -679,6 +845,7 @@ GNN_MODELS = {
         'name': 'GraphRNN',
         'description': 'Generating Realistic Graphs with Recurrent Neural Networks',
         'paper': 'You et al., ICML 2018',
+        'applications': ['Molecular Graph Generation', 'Social Network Generation', 'Chemical Compound Design', 'Drug Discovery', 'Network Topology Generation'],
         'category': 'graph_generation',
         'architecture': 'recurrent',
         'inductive': False,
@@ -707,6 +874,7 @@ GNN_MODELS = {
         'name': 'GraphVAE',
         'description': 'Variational Autoencoder for Graph Generation',
         'paper': 'Simonovsky & Komodakis, NeurIPS 2018',
+        'applications': ['Molecular Graph Generation', 'Chemical Compound Design', 'Drug Discovery', 'Network Reconstruction', 'Graph Completion'],
         'category': 'graph_generation',
         'architecture': 'variational_autoencoder',
         'inductive': False,
@@ -736,6 +904,7 @@ GNN_MODELS = {
         'name': 'GraphGAN',
         'description': 'Generative Adversarial Network for Graph Generation',
         'paper': 'Wang et al., AAAI 2018',
+        'applications': ['Social Network Generation', 'Citation Network Generation', 'Protein Interaction Networks', 'Network Topology Generation', 'Graph Data Augmentation'],
         'category': 'graph_generation',
         'architecture': 'generative_adversarial',
         'inductive': False,
@@ -765,6 +934,7 @@ GNN_MODELS = {
         'name': 'MolGAN',
         'description': 'An implicit generative model for small molecular graphs',
         'paper': 'De Cao & Kipf, ICML 2018',
+        'applications': ['Molecular Graph Generation', 'Drug Discovery', 'Chemical Compound Design', 'Molecular Property Optimization', 'De Novo Drug Design'],
         'category': 'graph_generation',
         'architecture': 'generative_adversarial',
         'inductive': False,
@@ -794,6 +964,7 @@ GNN_MODELS = {
         'name': 'GraphAF',
         'description': 'Flow-based Autoregressive Model for Graph Generation',
         'paper': 'Shi et al., ICML 2020',
+        'applications': ['Molecular Graph Generation', 'Chemical Compound Design', 'Drug Discovery', 'Molecular Property Optimization', 'Controlled Graph Generation'],
         'category': 'graph_generation',
         'architecture': 'flow_autoregressive',
         'inductive': False,
@@ -822,6 +993,7 @@ GNN_MODELS = {
         'name': 'GraphScore',
         'description': 'Score-based Model for Graph Generation',
         'paper': 'Various papers on score-based graph generation',
+        'applications': ['Molecular Graph Generation', 'Chemical Compound Design', 'Drug Discovery', 'Network Topology Generation', 'Controlled Graph Generation'],
         'category': 'graph_generation',
         'architecture': 'score_based',
         'inductive': False,
